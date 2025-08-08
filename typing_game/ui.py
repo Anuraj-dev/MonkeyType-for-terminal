@@ -167,14 +167,19 @@ def highlight_word(target: str, typed: str, caret: bool = True) -> List[Tuple[st
 
 	style values: 'correct', 'wrong', 'caret' (for next char), 'pending'.
 	Caret is placed at next character to type if caret flag True and word not complete.
+	Better error visualization for mismatches and omissions.
 	"""
 	out: List[Tuple[str, str]] = []
+	
 	# Compare each position of typed vs target
 	for i, ch in enumerate(typed):
 		if i < len(target) and ch == target[i]:
 			out.append((ch, "correct"))
 		else:
+			# Character is wrong (either mismatch or extra)
 			out.append((ch, "wrong"))
+	
+	# Handle remaining characters in target
 	if len(typed) < len(target):
 		next_char = target[len(typed)]
 		if caret:
@@ -184,6 +189,7 @@ def highlight_word(target: str, typed: str, caret: bool = True) -> List[Tuple[st
 				out.append((remaining, "pending"))
 		else:
 			out.append((target[len(typed):], "pending"))
+	
 	return out
 
 

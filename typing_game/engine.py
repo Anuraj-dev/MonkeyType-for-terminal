@@ -21,6 +21,7 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass
 from typing import Callable, Iterator, Optional
+from pathlib import Path
 
 from .config import ModeConfig, validate_mode_config
 from .metrics import (
@@ -67,8 +68,42 @@ def _commit_word(stats: LiveStats, target: str, typed: str):
 	for i, ch in enumerate(typed):
 		correct = i < len(target) and ch == target[i]
 		update_on_char(stats, correct)
-	# Count omissions (characters not typed) as errors? For now: ignore omissions.
+	
+	# Count omissions (characters not typed) as errors
+	if len(typed) < len(target):
+		omissions = len(target) - len(typed)
+		for _ in range(omissions):
+			update_on_char(stats, False)  # Each omitted character is an error
+	
 	# Space after word (unless last) counted when user entered space; already handled.
+
+
+def _analyze_word_errors(target: str, typed: str) -> dict[str, int]:
+	"""Analyze typing errors in a word for debugging/feedback.
+	
+	Returns dict with keys: 'correct', 'wrong', 'omissions', 'extras'
+	"""
+	correct = 0
+	wrong = 0
+	
+	# Count character-by-character matches/mismatches
+	min_len = min(len(target), len(typed))
+	for i in range(min_len):
+		if target[i] == typed[i]:
+			correct += 1
+		else:
+			wrong += 1
+	
+	# Count omissions and extras
+	omissions = max(0, len(target) - len(typed))
+	extras = max(0, len(typed) - len(target))
+	
+	return {
+		'correct': correct,
+		'wrong': wrong,
+		'omissions': omissions,
+		'extras': extras
+	}
 
 
 def _iterate_mode_words(mode) -> Iterator[str]:
@@ -147,6 +182,7 @@ def run_session(
 	net_wpm = compute_net_wpm(stats)
 	acc = stats.accuracy()
 	key = mode_key(cfg)
+	
 	# previous best lookup BEFORE recording new score
 	prev_best: Optional[float] = None
 	try:
@@ -155,8 +191,13 @@ def run_session(
 			prev_best = max((e.wpm for e in store[key]), default=None)
 	except Exception:
 		pass
-	entry = HighScoreEntry.create(key, net_wpm, acc, raw_wpm, stats.errors, stats.chars_typed)
-	highscore_new = record_highscore(key, entry, top_n=cfg.top_n_highscores)
+	
+	# Only record highscore if it's an improvement or first attempt
+	highscore_new = False
+	if prev_best is None or net_wpm > prev_best:
+		entry = HighScoreEntry.create(key, net_wpm, acc, raw_wpm, stats.errors, stats.chars_typed)
+		highscore_new = record_highscore(key, entry, top_n=cfg.top_n_highscores)
+	
 	consistency = compute_consistency(stats)
 	return SessionResult(cfg, raw_wpm, net_wpm, acc, stats.errors, stats.chars_typed, elapsed, highscore_new, previous_best_net_wpm=prev_best, consistency=consistency)
 
@@ -183,10 +224,24 @@ def end_screen(res: SessionResult):  # pragma: no cover - I/O convenience
 	print(f"Accuracy: {res.accuracy*100:.2f}%  Errors: {res.errors}  Chars: {res.chars}")
 	if res.consistency > 0:
 		print(f"Consistency: {res.consistency*100:.1f}%")
+	
+	# Show improvement feedback
 	if res.previous_best_net_wpm is not None:
+		improvement = res.net_wpm - res.previous_best_net_wpm
 		print(f"Previous Best Net WPM: {res.previous_best_net_wpm:.2f}")
+		if improvement > 0:
+			print(f"🎉 IMPROVEMENT: +{improvement:.2f} WPM!")
+		elif improvement < 0:
+			print(f"📉 Below best by {abs(improvement):.2f} WPM")
+		else:
+			print("🎯 Matched your best!")
+	else:
+		print("🆕 First attempt for this mode!")
+	
 	if res.highscore_new:
-		print("*** NEW HIGHSCORE! ***")
+		print("*** NEW HIGHSCORE SAVED! ***")
+	elif res.previous_best_net_wpm is not None and res.net_wpm <= res.previous_best_net_wpm:
+		print("💡 No highscore saved (no improvement)")
 	print("==============================")
 
 
@@ -206,13 +261,47 @@ def _maybe_print_fallback_banner():  # pragma: no cover - simple UX hint
 		_fallback_banner_printed = True
 
 
+def _choose_difficulty() -> Path | None:  # pragma: no cover - user interaction
+	"""Let user choose difficulty level"""
+	print("\n🎯 Choose Difficulty Level:")
+	print("1. Easy (short common words)")
+	print("2. Medium (moderate length words)")  
+	print("3. Hard (complex words)")
+	print("4. Programming (technical terms)")
+	print("5. Alice in Wonderland (book content)")
+	print("6. Default (mixed)")
+	
+	choice = input("\nEnter choice (1-6): ").strip()
+	
+	wordlist_map = {
+		"1": "data/wordlists/easy.txt",
+		"2": "data/wordlists/medium.txt", 
+		"3": "data/wordlists/hard_words.txt",
+		"4": "data/wordlists/programming.txt",
+		"5": "data/wordlists/alice_words.txt",
+		"6": None  # default
+	}
+	
+	wordlist_path = wordlist_map.get(choice)
+	if wordlist_path:
+		from pathlib import Path
+		path_obj = Path(wordlist_path)
+		if path_obj.exists():
+			print(f"✅ Selected {path_obj.name}")
+			return path_obj
+		else:
+			print(f"❌ Word list not found: {wordlist_path}")
+			return None
+	return None
+
+
 def _prompt_mode_change(current: ModeConfig) -> ModeConfig:  # pragma: no cover - user interaction
 	print("Change mode:")
 	print(" 1) Timed")
 	print(" 2) Word-count")
 	print(" 3) Toggle punctuation (current %.2f)" % current.punctuation_prob)
 	print(" 4) Toggle numbers (currently %s)" % ("ON" if current.numbers else "OFF"))
-	print(" 5) Change word list")
+	print(" 5) Change difficulty")
 	choice = input("Select option (blank to cancel): ").strip()
 	if choice == "1":
 		val = input("Seconds: ").strip()
@@ -239,12 +328,9 @@ def _prompt_mode_change(current: ModeConfig) -> ModeConfig:  # pragma: no cover 
 	elif choice == "4":
 		current.numbers = not current.numbers
 	elif choice == "5":
-		path = input("Word list path: ").strip()
-		if path:
-			from pathlib import Path
-			path_obj = Path(path)
-			if path_obj.exists():
-				current.wordlist_path = path_obj
+		new_wordlist = _choose_difficulty()
+		if new_wordlist is not None:
+			current.wordlist_path = new_wordlist
 	return current
 
 
@@ -344,6 +430,17 @@ def _run_session_curses(cfg: ModeConfig) -> SessionResult:  # pragma: no cover -
 					typed_current += "/"
 				elif token == "q" and not typed_current:  # quick quit if no current typing
 					break
+				elif key == 10 or key == 13:  # Enter key (CR or LF)
+					# commit word on Enter press
+					_commit_word(stats, target, typed_current)
+					update_on_char(stats, True)  # space char baseline
+					current_index += 1
+					# record per-word duration
+					w_dur = time.monotonic() - word_started_at
+					if w_dur >= 0:
+						stats.word_durations.append(w_dur)
+					word_started_at = time.monotonic()
+					typed_current = ""
 				elif token == " ":
 					# commit word
 					_commit_word(stats, target, typed_current)

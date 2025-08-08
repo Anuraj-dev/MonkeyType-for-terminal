@@ -3,6 +3,4 @@
 windows-curses; platform_system == "Windows"
 
 # Dev / quality tools
-ruff
-mypy
 pytest

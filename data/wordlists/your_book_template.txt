@@ -1,0 +1,15 @@
+# Paste your 10-page book content here!
+# For example, from a novel, textbook, or any text you want to practice typing
+
+# Sample from "The Great Gatsby" - replace with your content:
+
+In my younger and more vulnerable years my father gave me some advice that I've carried with me ever since. "Whenever you feel like criticizing anyone," he told me, "just remember that all the people in this world haven't had the advantages that you've had."
+
+He didn't say any more, but we've always been unusually communicative in a reserved way, and I understood that he meant a great deal more than that. In consequence, I'm inclined to reserve all judgments, a habit that has opened up many curious natures to me and also made me the victim of not a few veteran bores.
+
+# Instructions:
+# 1. Delete these comments
+# 2. Paste your book content (10 pages worth)
+# 3. Save the file
+# 4. Run: python convert_book.py
+# 5. The game will create a word list from your book!

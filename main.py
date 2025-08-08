@@ -25,7 +25,7 @@ from typing_game.config import (
 	merge_cli_args,
 	save_last_config,
 )
-from typing_game.engine import interactive_loop
+from typing_game.engine import interactive_loop, _choose_difficulty
 from typing_game.storage import load_highscores
 
 
@@ -55,7 +55,7 @@ def interactive_menu(base_cfg: ModeConfig) -> ModeConfig:  # pragma: no cover - 
 		print("3) Show highscores")
 		print("4) Toggle punctuation (currently: %.2f)" % base_cfg.punctuation_prob)
 		print(f"5) Toggle numbers (currently: {'ON' if base_cfg.numbers else 'OFF'})")
-		print("6) Change word list (currently: %s)" % (base_cfg.wordlist_path or "<default/none>"))
+		print("6) Change difficulty (currently: %s)" % (base_cfg.wordlist_path.name if base_cfg.wordlist_path else "<default>"))
 		print("Q) Quit")
 		choice = input("Select: ").strip().lower()
 		if choice == "1":
@@ -87,13 +87,9 @@ def interactive_menu(base_cfg: ModeConfig) -> ModeConfig:  # pragma: no cover - 
 		elif choice == "5":
 			base_cfg.numbers = not base_cfg.numbers
 		elif choice == "6":
-			path = input("Path to word list file: ").strip()
-			if path:
-				path_obj = Path(path)
-				if path_obj.exists():
-					base_cfg.wordlist_path = path_obj
-				else:
-					print("File does not exist")
+			new_wordlist = _choose_difficulty()
+			if new_wordlist is not None:
+				base_cfg.wordlist_path = new_wordlist
 		elif choice in {"q", "quit", "exit"}:
 			raise SystemExit(0)
 		else:
