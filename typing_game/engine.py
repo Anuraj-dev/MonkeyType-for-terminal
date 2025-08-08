@@ -29,6 +29,8 @@ from .storage import HighScoreEntry, record_highscore, load_highscores
 from .modes import build_timed_mode, build_word_count_mode, mode_key
 from .config import ModeConfig, validate_mode_config
 from .words import load_words
+from .ui import highlight_word, wrap_words, build_header_line, build_progress_bar, CursesSession, normalize_key
+from .utils import debug_log
 
 __all__ = [
 	"run_session",
@@ -229,7 +231,8 @@ def interactive_loop(initial_cfg: ModeConfig):  # pragma: no cover - user intera
 	cfg = initial_cfg
 	while True:
 		try:
-			res = run_session(cfg)
+			# Prefer real-time curses loop if available
+			res = _try_realtime_session(cfg)
 		except KeyboardInterrupt:
 			print("\n[Interrupted] Returning to menu.")
 			break
@@ -242,3 +245,146 @@ def interactive_loop(initial_cfg: ModeConfig):  # pragma: no cover - user intera
 			continue
 		# default restart same
 		continue
+
+
+# --------------------------- Real-time Curses Loop ---------------------------
+
+def _try_realtime_session(cfg: ModeConfig) -> SessionResult:
+	"""Attempt a real-time curses session; fall back to plain session on failure.
+
+	This early version updates metrics per keystroke and does NOT roll back stats
+	on backspace (limitation). Future refinement will reconcile per-word commit
+	accuracy with live updates.
+	"""
+	try:
+		import curses  # type: ignore
+	except Exception:  # curses not available
+		return run_session(cfg)
+	try:
+		return _run_session_curses(cfg)
+	except Exception as e:  # safety fallback
+		debug_log("curses loop failed, falling back", e)
+		return run_session(cfg)
+
+
+def _run_session_curses(cfg: ModeConfig) -> SessionResult:  # pragma: no cover - interactive
+	validate_mode_config(cfg)
+	if cfg.timed_seconds is not None:
+		mode = build_timed_mode(cfg.timed_seconds, punctuation_prob=cfg.punctuation_prob, numbers=cfg.numbers, wordlist_path=cfg.wordlist_path, top_n_highscores=cfg.top_n_highscores)
+	else:
+		mode = build_word_count_mode(cfg.word_count, punctuation_prob=cfg.punctuation_prob, numbers=cfg.numbers, wordlist_path=cfg.wordlist_path, top_n_highscores=cfg.top_n_highscores)
+
+	# Initialize state
+	started = time.monotonic()
+	stats = LiveStats(started_at=started, last_update=started)
+	words_iter = _iterate_mode_words(mode)
+	targets: list[str] = []
+	current_index = 0
+	typed_current = ""
+
+	with CursesSession() as scr:
+		# If fallback (scr is None) revert to plain
+		if scr is None:
+			return run_session(cfg)
+		scr.nodelay(True)
+		curses = __import__("curses")  # local ref
+		while True:
+			now = time.monotonic()
+			# End conditions
+			if cfg.timed_seconds is not None and elapsed_seconds(stats, now) >= cfg.timed_seconds:
+				break
+			if cfg.word_count is not None and current_index >= cfg.word_count:
+				break
+			# Ensure we have enough upcoming words
+			while len(targets) <= current_index + 25:
+				try:
+					targets.append(next(words_iter))
+				except StopIteration:
+					break
+			target = targets[current_index]
+
+			# Input handling
+			try:
+				key = scr.getch()
+			except Exception:
+				key = -1
+			if key != -1:
+				token = normalize_key(key)
+				if token == "BACKSPACE":
+					if typed_current:
+						typed_current = typed_current[:-1]
+				elif token is None:
+					pass
+				elif token == "/":  # allow /quit prefix style
+					# collect command quickly
+					typed_current += "/"
+				elif token == "q" and not typed_current:  # quick quit if no current typing
+					break
+				elif token == " ":
+					# commit word
+					_commit_word(stats, target, typed_current)
+					update_on_char(stats, True)  # space char baseline
+					current_index += 1
+					typed_current = ""
+				else:
+					# normal char
+					ch = token
+					idx = len(typed_current)
+					correct = idx < len(target) and ch == target[idx]
+					update_on_char(stats, correct)
+					typed_current += ch
+					# auto commit if full length typed and next key not needed
+					if len(typed_current) >= len(target):
+						# Wait for space OR auto-commit? We'll wait for explicit space to mimic plain mode.
+						pass
+
+			# Rendering
+			scr.erase()
+			# Header
+			elapsed = elapsed_seconds(stats, now)
+			raw_wpm = compute_raw_wpm(stats, now)
+			net_wpm = compute_net_wpm(stats, now)
+			acc = stats.accuracy() * 100
+			if cfg.timed_seconds is not None:
+				prog = elapsed / cfg.timed_seconds if cfg.timed_seconds else 0
+				mode_desc = f"Timed {cfg.timed_seconds}s"
+			else:
+				prog = current_index / cfg.word_count if cfg.word_count else 0
+				mode_desc = f"Words {cfg.word_count}"
+			bar = build_progress_bar(prog, max(10, min(30, curses.COLS - 60)))
+			header = build_header_line(mode_desc, elapsed, net_wpm, stats.accuracy(), stats.errors)
+			scr.addnstr(0, 0, header, curses.COLS - 1)
+			scr.addnstr(1, 0, bar, curses.COLS - 1)
+
+			# Word area
+			display_words = [target] + targets[current_index + 1: current_index + 15]
+			# Highlight current word
+			segments = highlight_word(target, typed_current)
+			rendered_current = "".join(seg for seg, _ in segments)
+			display_words[0] = rendered_current
+			wrapped = wrap_words(display_words, max(20, curses.COLS - 2))
+			for i, line in enumerate(wrapped[: curses.LINES - 3]):
+				scr.addnstr(3 + i, 0, line, curses.COLS - 1)
+			scr.refresh()
+			# Sleep a tiny bit to reduce CPU spin
+			time.sleep(0.01)
+
+	# Final commit if user typed something but didn't press space (optional)
+	if typed_current:
+		_commit_word(stats, target, typed_current)
+	# Build result (reuse code path via record)
+	elapsed = elapsed_seconds(stats)
+	raw_wpm = compute_raw_wpm(stats)
+	net_wpm = compute_net_wpm(stats)
+	acc = stats.accuracy()
+	key = mode_key(cfg)
+	prev_best: Optional[float] = None
+	try:
+		store = load_highscores()
+		if key in store and store[key]:
+			prev_best = max((e.wpm for e in store[key]), default=None)
+	except Exception:
+		pass
+	entry = HighScoreEntry.create(key, net_wpm, acc, raw_wpm, stats.errors, stats.chars_typed)
+	highscore_new = record_highscore(key, entry, top_n=cfg.top_n_highscores)
+	return SessionResult(cfg, raw_wpm, net_wpm, acc, stats.errors, stats.chars_typed, elapsed, highscore_new, previous_best_net_wpm=prev_best)

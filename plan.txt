@@ -164,6 +164,7 @@ Legend:
 - [ ] Ensure no blocking I/O inside render loop (pending curses integration)
 - [ ] Use try/finally for terminal restore (defer to curses integration)
 - [x] Logging (optional) behind debug flag (debug_log via env var)
+ - [~] Initial real-time curses loop (prototype; no backspace stat rollback, blocking getch avoided with nodelay)
 
 ## 16. Quality Gates
 - [ ] Lint (flake8 / ruff)
