@@ -41,16 +41,16 @@ Legend:
 - [x] Validation helpers (e.g., assert timed xor word-count)
 
 ## 3. Word Handling (`words.py`)
-- [ ] Load base list (cache in module variable)
-- [ ] Shuffle logic
-- [ ] Generator for timed (infinite) mode
-- [ ] Generator for word-count mode (finite)
-- [ ] Optional punctuation injection
-  - [ ] Config probability
-  - [ ] Keep correctness mapping
-- [ ] Optional numbers injection
-- [ ] Difficulty future hook (length buckets)
-- [ ] Unit tests (word count, punctuation probability rough check)
+- [x] Load base list (cache in module variable)
+- [x] Shuffle logic
+- [x] Generator for timed (infinite) mode
+- [x] Generator for word-count mode (finite)
+- [x] Optional punctuation injection
+  - [x] Config probability
+  - [ ] Keep correctness mapping (deferred to metrics integration)
+- [x] Optional numbers injection
+- [ ] Difficulty future hook (length buckets) (future)
+- [x] Unit tests (word count, punctuation probability rough check basic)
 
 ## 4. Metrics Layer (`metrics.py`)
 - [ ] Time source uses `time.monotonic()`

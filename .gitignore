@@ -47,5 +47,5 @@ Thumbs.db
 # Project specific data generated at runtime
 highscores.json
 
-# (plan.txt intentionally tracked for progress history)
-plan.txt
+#Else
+tests
