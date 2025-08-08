@@ -31,7 +31,7 @@ Legend:
 - [x] Create empty `highscores.json` or let code generate
 - [x] Add `requirements.txt` (windows-curses (Windows only), optional rich later)
 - [x] Write README stub
-- [ ] Git init + first commit
+- [x] Git init + first commit
 
 ## 2. Core Data Models
 - [ ] Define `ModeConfig` dataclass
