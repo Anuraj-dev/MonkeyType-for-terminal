@@ -16,6 +16,7 @@ Usage examples:
 from __future__ import annotations
 
 import argparse
+import os
 from pathlib import Path
 from typing import Optional
 
@@ -139,6 +140,13 @@ def main():  # pragma: no cover - user interactive
 	last_cfg = load_last_config()
 	parser = build_parser()
 	ns = parser.parse_args()
+	# Fallback warning if curses missing (Section 14)
+	try:
+		import curses  # noqa: F401
+	except Exception:
+		print("[Fallback] curses not available. Running in plain line mode.")
+		if os.name == "nt":
+			print("Hint: pip install windows-curses for full UI.")
 	try:
 		run_from_args(ns, last_cfg)
 	except ValueError as e:

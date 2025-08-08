@@ -154,9 +154,9 @@ Legend:
 - [x] Dispatch to engine
 
 ## 14. Fallback Plain Mode
-- [ ] Detect if curses import fails
-- [ ] Provide simplified line-based test mode (no live WPM)
-- [ ] Warn user to install `windows-curses` on Windows
+- [x] Detect if curses import fails
+- [x] Provide simplified line-based test mode (no live WPM)
+- [x] Warn user to install `windows-curses` on Windows
 
 ## 15. Performance & Stability
 - [ ] Use diff or partial re-render
