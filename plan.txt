@@ -90,19 +90,19 @@ Legend:
 - [x] Unit tests (mode key structure)
 
 ## 8. UI Layer (`ui.py`)
-- [ ] Curses initialization + teardown (context manager)
-- [ ] Color pairs (correct, wrong, dim, caret)
-- [ ] Terminal size measurement
-- [ ] Render header (mode, list, time, WPM, accuracy, errors)
-- [ ] Render word area (wrap aware)
-- [ ] Highlight:
-  - [ ] Correct chars (green)
-  - [ ] Incorrect chars (red)
-  - [ ] Current target char (underline or reverse)
-- [ ] Progress bar (time or words)
-- [ ] Throttle updates (e.g., >= 60ms)
-- [ ] Fallback plain mode if curses not available
-- [ ] Unit test (if practical) for text segmentation (pure functions only)
+- [x] Curses initialization + teardown (context manager)
+- [x] Color pairs (correct, wrong, dim, caret)
+- [x] Terminal size measurement (basic via curses helpers to be expanded later)
+- [x] Render header (mode, list, time, WPM, accuracy, errors)
+- [x] Render word area (wrap aware) (pure wrap function)
+- [x] Highlight:
+  - [x] Correct chars (green)
+  - [x] Incorrect chars (red)
+  - [x] Current target char (caret style)
+- [x] Progress bar (time or words)
+- [x] Throttle updates (>= 60ms)
+- [x] Fallback plain mode if curses not available
+- [x] Unit test (pure functions only)
 
 ## 9. Engine (`engine.py`)
 - [ ] Initialize stats + timers
