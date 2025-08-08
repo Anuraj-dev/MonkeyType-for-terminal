@@ -1,0 +1,35 @@
+{
+  "modes": {
+    "timed-15-p0-n0": [
+      {
+        "mode_key": "timed-15-p0-n0",
+        "wpm": 43.2,
+        "accuracy": 0.9821,
+        "raw_wpm": 44.8,
+        "errors": 1,
+        "total_chars": 56,
+        "timestamp": "2025-08-08T18:14:56Z"
+      }
+    ],
+    "timed-20-p0-n0": [
+      {
+        "mode_key": "timed-20-p0-n0",
+        "wpm": 58.79,
+        "accuracy": 1.0,
+        "raw_wpm": 58.79,
+        "errors": 0,
+        "total_chars": 98,
+        "timestamp": "2025-08-08T18:21:05Z"
+      },
+      {
+        "mode_key": "timed-20-p0-n0",
+        "wpm": 31.19,
+        "accuracy": 0.9483,
+        "raw_wpm": 34.78,
+        "errors": 3,
+        "total_chars": 58,
+        "timestamp": "2025-08-08T18:21:34Z"
+      }
+    ]
+  }
+}

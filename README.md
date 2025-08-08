@@ -2,6 +2,8 @@
 
 A powerful terminal typing practice tool with intelligent error detection, smart highscore management, and multiple difficulty levels. Supports both timed and word-count modes with real-time feedback and comprehensive statistics.
 
+**🔗 Repository:** https://github.com/Anuraj-dev/MonkeyType-for-terminal
+
 ## ✨ Key Features
 
 ### 🎯 **Smart Typing Analysis**
@@ -42,19 +44,26 @@ A powerful terminal typing practice tool with intelligent error detection, smart
 
 ### Installation
 
-1. **Install the package in editable mode:**
+1. **Clone the repository:**
+
+```bash
+git clone https://github.com/Anuraj-dev/MonkeyType-for-terminal.git
+cd MonkeyType-for-terminal
+```
+
+2. **Install the package in editable mode:**
 
 ```bash
 pip install -e .
 ```
 
-2. **For Windows users (full-screen mode):**
+3. **For Windows users (full-screen mode):**
 
 ```bash
 pip install windows-curses
 ```
 
-3. **For development:**
+4. **For development:**
 
 ```bash
 pip install -r requirements.txt
@@ -101,7 +110,7 @@ python convert_book.py
 ```bash
 # Ubuntu/Debian - Complete setup
 sudo apt update && sudo apt install python3 python3-pip python3-venv git -y
-git clone <repository-url> && cd TypingGame
+git clone https://github.com/Anuraj-dev/MonkeyType-for-terminal.git && cd MonkeyType-for-terminal
 python3 -m venv venv && source venv/bin/activate
 pip install -e . && python3 demo.py
 ```
@@ -110,7 +119,7 @@ pip install -e . && python3 demo.py
 
 ```bash
 sudo dnf install python3 python3-pip git -y
-git clone <repository-url> && cd TypingGame
+git clone https://github.com/Anuraj-dev/MonkeyType-for-terminal.git && cd MonkeyType-for-terminal
 python3 -m venv venv && source venv/bin/activate
 pip install -e . && python3 demo.py
 ```
@@ -119,7 +128,7 @@ pip install -e . && python3 demo.py
 
 ```bash
 sudo pacman -S python python-pip git
-git clone <repository-url> && cd TypingGame
+git clone https://github.com/Anuraj-dev/MonkeyType-for-terminal.git && cd MonkeyType-for-terminal
 python3 -m venv venv && source venv/bin/activate
 pip install -e . && python3 demo.py
 ```
@@ -127,7 +136,7 @@ pip install -e . && python3 demo.py
 **Daily Usage (after setup):**
 
 ```bash
-cd TypingGame
+cd MonkeyType-for-terminal
 source venv/bin/activate  # Activate environment
 python3 demo.py          # Start typing practice!
 ```
@@ -297,7 +306,7 @@ pytest tests/ -q     # Quick test run
 ### Project Structure
 
 ```
-TypingGame/
+MonkeyType-for-terminal/
 ├── typing_game/           # Main package
 │   ├── engine.py         # Game logic & sessions
 │   ├── ui.py            # Terminal interface
@@ -367,8 +376,8 @@ sudo pacman -S python python-pip git
 
 ```bash
 # 1. Clone the repository
-git clone <repository-url>
-cd TypingGame
+git clone https://github.com/Anuraj-dev/MonkeyType-for-terminal.git
+cd MonkeyType-for-terminal
 
 # 2. Create virtual environment (recommended)
 python3 -m venv venv
@@ -450,7 +459,7 @@ python3.11 main.py         # Another version
 cat > ~/Desktop/typing-game.desktop << EOF
 [Desktop Entry]
 Name=Typing Game
-Exec=/path/to/TypingGame/venv/bin/python /path/to/TypingGame/main.py
+Exec=/path/to/MonkeyType-for-terminal/venv/bin/python /path/to/MonkeyType-for-terminal/main.py
 Icon=utilities-terminal
 Type=Application
 Terminal=true
@@ -458,7 +467,7 @@ EOF
 chmod +x ~/Desktop/typing-game.desktop
 
 # Add to PATH for system-wide access
-echo 'export PATH="$PATH:/path/to/TypingGame"' >> ~/.bashrc
+echo 'export PATH="$PATH:/path/to/MonkeyType-for-terminal"' >> ~/.bashrc
 source ~/.bashrc
 typing-game  # Now accessible from anywhere
 ```
@@ -571,8 +580,8 @@ MIT License - feel free to use, modify, and distribute!
 **Ready to improve your typing?**
 
 ```bash
-git clone <repository>
-cd TypingGame
+git clone https://github.com/Anuraj-dev/MonkeyType-for-terminal.git
+cd MonkeyType-for-terminal
 pip install -e .
 python demo.py
 ```
