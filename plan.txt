@@ -53,14 +53,14 @@ Legend:
 - [x] Unit tests (word count, punctuation probability rough check basic)
 
 ## 4. Metrics Layer (`metrics.py`)
-- [ ] Time source uses `time.monotonic()`
-- [ ] Incremental update: on char typed
-- [ ] Accuracy formula
-- [ ] Raw WPM
-- [ ] Net/Gross decision + docstring explaining formula
-- [ ] Consistency placeholder (per-word durations list)
-- [ ] Edge: safeguard divide-by-zero
-- [ ] Unit tests for WPM + accuracy
+- [x] Time source uses `time.monotonic()`
+- [x] Incremental update: on char typed
+- [x] Accuracy formula
+- [x] Raw WPM
+- [x] Net/Gross decision + docstring explaining formula
+- [x] Consistency placeholder (per-word durations list)
+- [x] Edge: safeguard divide-by-zero
+- [x] Unit tests for WPM + accuracy
 
 ## 5. Storage (`storage.py`)
 - [ ] Path resolution (local file / user home fallback)
