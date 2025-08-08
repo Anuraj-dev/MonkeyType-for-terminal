@@ -35,6 +35,7 @@ __all__ = [
 	"save_highscores",
 	"insert_entry",
 	"record_highscore",
+	"get_top_highscores",
 ]
 
 
@@ -176,3 +177,18 @@ def record_highscore(
 	if kept:
 		save_highscores(store, path)
 	return kept
+
+
+def get_top_highscores(mode_key: str, limit: int = 10, path: Path | None = None) -> list[HighScoreEntry]:
+	"""Return up to `limit` highscores for the given mode key.
+
+	Results are ordered using the same ordering logic as insertion.
+	This is a read-only helper for display purposes.
+	"""
+	if limit <= 0:
+		return []
+	store = load_highscores(path)
+	entries = store.get(mode_key, [])
+	# Ensure ordering (in case file manually edited)
+	ordered = sorted(entries, key=lambda e: (-e.wpm, -e.accuracy, e.timestamp))
+	return ordered[:limit]

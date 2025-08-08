@@ -135,11 +135,11 @@ Legend:
 - [x] Clear screen before/after
 
 ## 12. Highscore Integration
-- [ ] Acquire mode key after session
-- [ ] Generate entry
-- [ ] Insert + detect new record
-- [ ] Provide top N retrieval for potential future display
-- [ ] Add human-readable date (ISO timestamp)
+- [x] Acquire mode key after session
+- [x] Generate entry
+- [x] Insert + detect new record
+- [x] Provide top N retrieval for potential future display
+- [x] Add human-readable date (ISO timestamp)
 
 ## 13. CLI (`main.py`)
 - [ ] argparse for
