@@ -63,13 +63,13 @@ Legend:
 - [x] Unit tests for WPM + accuracy
 
 ## 5. Storage (`storage.py`)
-- [ ] Path resolution (local file / user home fallback)
-- [ ] Load highscores (graceful if missing/corrupt)
-- [ ] Insert logic (sorted by WPM desc, tie accuracy)
-- [ ] Truncate list to top N (configurable)
-- [ ] Atomic write (temp file replace)
-- [ ] Function `record_highscore(mode_key, entry) -> bool`
-- [ ] Unit tests (insert ordering, tie-breaking, truncation)
+- [x] Path resolution (local file / user home fallback)
+- [x] Load highscores (graceful if missing/corrupt)
+- [x] Insert logic (sorted by WPM desc, tie accuracy)
+- [x] Truncate list to top N (configurable)
+- [x] Atomic write (temp file replace)
+- [x] Function `record_highscore(mode_key, entry) -> bool`
+- [x] Unit tests (insert ordering, tie-breaking, truncation)
 
 ## 6. Configuration (`config.py`)
 - [ ] Default config loader
