@@ -72,22 +72,22 @@ Legend:
 - [x] Unit tests (insert ordering, tie-breaking, truncation)
 
 ## 6. Configuration (`config.py`)
-- [ ] Default config loader
-- [ ] CLI merge function
-- [ ] Persistence of last used settings (optional file)
-- [ ] Validate:
-  - [ ] duration > 0
-  - [ ] wordlist exists
-  - [ ] punctuation probability in [0,1]
-- [ ] Provide `get_or_create_config_path()`
-- [ ] Unit tests for merges
+- [x] Default config loader
+- [x] CLI merge function
+- [x] Persistence of last used settings (optional file)
+- [x] Validate:
+  - [x] duration > 0
+  - [x] wordlist exists
+  - [x] punctuation probability in [0,1]
+- [x] Provide `get_or_create_config_path()`
+- [x] Unit tests for merges
 
 ## 7. Modes (`modes.py`)
-- [ ] Factory: build timed config from seconds
-- [ ] Factory: build word-count config
-- [ ] Abstraction: unify interface (yield words, end condition function)
-- [ ] Mode key standardization
-- [ ] Unit tests (mode key structure)
+- [x] Factory: build timed config from seconds
+- [x] Factory: build word-count config
+- [x] Abstraction: unify interface (yield words, end condition function)
+- [x] Mode key standardization
+- [x] Unit tests (mode key structure)
 
 ## 8. UI Layer (`ui.py`)
 - [ ] Curses initialization + teardown (context manager)

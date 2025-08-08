@@ -50,6 +50,8 @@ class HighScoreEntry:
 
 	@staticmethod
 	def create(mode_key: str, wpm: float, accuracy: float, raw_wpm: float, errors: int, total_chars: int) -> "HighScoreEntry":
+		# Use 'Z' suffix for UTC to satisfy tests expecting trailing Z.
+		iso = datetime.now(UTC).replace(tzinfo=UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
 		return HighScoreEntry(
 			mode_key=mode_key,
 			wpm=round(wpm, 2),
@@ -57,7 +59,7 @@ class HighScoreEntry:
 			raw_wpm=round(raw_wpm, 2),
 			errors=errors,
 			total_chars=total_chars,
-			timestamp=datetime.now(UTC).isoformat(timespec="seconds"),
+			timestamp=iso,
 		)
 
 	def to_dict(self) -> dict[str, Any]:
