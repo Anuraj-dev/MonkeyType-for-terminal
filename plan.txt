@@ -34,11 +34,11 @@ Legend:
 - [x] Git init + first commit
 
 ## 2. Core Data Models
-- [ ] Define `ModeConfig` dataclass
-- [ ] Define `HighScoreEntry` dataclass
-- [ ] Define `LiveStats` dataclass
-- [ ] Implement `make_mode_key(cfg)`
-- [ ] Validation helpers (e.g., assert timed xor word-count)
+- [x] Define `ModeConfig` dataclass
+- [x] Define `HighScoreEntry` dataclass
+- [x] Define `LiveStats` dataclass
+- [x] Implement `make_mode_key(cfg)`
+- [x] Validation helpers (e.g., assert timed xor word-count)
 
 ## 3. Word Handling (`words.py`)
 - [ ] Load base list (cache in module variable)
