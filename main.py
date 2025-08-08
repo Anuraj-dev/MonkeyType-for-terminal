@@ -133,7 +133,15 @@ def main():  # pragma: no cover - user interactive
 	last_cfg = load_last_config()
 	parser = build_parser()
 	ns = parser.parse_args()
-	run_from_args(ns, last_cfg)
+	try:
+		run_from_args(ns, last_cfg)
+	except ValueError as e:
+		# Provide a concise, user-friendly error then exit with non‑zero code.
+		print(f"Error: {e}")
+		if "wordlist path" in str(e).lower():
+			print("Tip: supply an existing file path, e.g. --list C:/path/to/words.txt")
+			print("If you intended to use default built-in list, omit --list.")
+		exit(1)
 
 
 if __name__ == "__main__":  # manual launch support
