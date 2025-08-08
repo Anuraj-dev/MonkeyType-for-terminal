@@ -159,16 +159,16 @@ Legend:
 - [x] Warn user to install `windows-curses` on Windows
 
 ## 15. Performance & Stability
-- [ ] Use diff or partial re-render
-- [ ] Limit allocations in hot path (reuse buffers)
-- [ ] Ensure no blocking I/O inside render loop
-- [ ] Use try/finally for terminal restore
-- [ ] Logging (optional) behind debug flag
+- [x] Use diff or partial re-render (LineDiffRenderer utility)
+- [ ] Limit allocations in hot path (reuse buffers) (future once real-time loop)
+- [ ] Ensure no blocking I/O inside render loop (pending curses integration)
+- [ ] Use try/finally for terminal restore (defer to curses integration)
+- [x] Logging (optional) behind debug flag (debug_log via env var)
 
 ## 16. Quality Gates
 - [ ] Lint (flake8 / ruff)
 - [ ] Formatting (black / ruff format)
-- [ ] Type hints (mypy optional)
+- [ ] Type hints (mypy)
 - [ ] Unit test pass
 - [ ] Manual play sessions (timed, word-count)
 - [ ] Highscore file integrity after multiple sessions
