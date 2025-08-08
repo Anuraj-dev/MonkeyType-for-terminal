@@ -142,16 +142,16 @@ Legend:
 - [x] Add human-readable date (ISO timestamp)
 
 ## 13. CLI (`main.py`)
-- [ ] argparse for
-  - [ ] --timed SECONDS
-  - [ ] --words COUNT
-  - [ ] --list WORDLIST
-  - [ ] --punct FLOAT
-  - [ ] --numbers
-  - [ ] --show-highscores
-- [ ] If no args → interactive menu
-- [ ] Help text clarity
-- [ ] Dispatch to engine
+- [x] argparse for
+  - [x] --timed SECONDS
+  - [x] --words COUNT
+  - [x] --list WORDLIST
+  - [x] --punct FLOAT
+  - [x] --numbers
+  - [x] --show-highscores
+- [x] If no args → interactive menu
+- [x] Help text clarity
+- [x] Dispatch to engine
 
 ## 14. Fallback Plain Mode
 - [ ] Detect if curses import fails
