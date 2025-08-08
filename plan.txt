@@ -105,21 +105,21 @@ Legend:
 - [x] Unit test (pure functions only)
 
 ## 9. Engine (`engine.py`)
-- [ ] Initialize stats + timers
-- [ ] Word acquisition
-- [ ] Input loop (non-blocking getch)
-- [ ] Backspace handling
-- [ ] Space triggers word commit
-- [ ] End conditions:
-  - [ ] Timed: exact moment time hits limit (stop immediately)
-  - [ ] Word-count: after last word commit
-- [ ] Early quit (ESC/Q)
-- [ ] Compute final metrics
-- [ ] Call highscore persistence
-- [ ] End screen rendering
-- [ ] Option: restart / change mode / quit
-- [ ] Escape hatch for exceptions (restore terminal)
-- [ ] Manual smoke test script notes
+- [x] Initialize stats + timers
+- [x] Word acquisition
+- [~] Input loop (prototype line-based; non-blocking getch deferred)
+- [x] Backspace handling (basic via line edit before submit)
+- [x] Space triggers word commit (line parsing per word)
+- [x] End conditions:
+  - [x] Timed: stop at limit
+  - [x] Word-count: after last word commit
+- [x] Early quit (ESC/Q) (implemented as `/quit` command prototype)
+- [x] Compute final metrics
+- [x] Call highscore persistence
+- [x] End screen rendering (summary print)
+- [x] Option: restart / change mode / quit (restart same config / quit)
+- [ ] Escape hatch for exceptions (restore terminal) (will add with curses integration)
+- [ ] Manual smoke test script notes (add later)
 
 ## 10. Input & Event Handling
 - [ ] Map key codes (backspace variations: 8, 127)
