@@ -10,7 +10,7 @@ from __future__ import annotations
 import os
 import sys
 from dataclasses import dataclass
-from typing import Iterable, List
+from typing import List
 
 _DEBUG_ENABLED = os.environ.get("TYPING_GAME_DEBUG", "0") in {"1", "true", "True"}
 

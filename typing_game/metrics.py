@@ -17,9 +17,9 @@ Many platforms show both; we will compute both for later UI display.
 
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass, field
 from typing import Optional
-import time
 
 from .config import ModeConfig
 
@@ -30,6 +30,7 @@ __all__ = [
 	"compute_raw_wpm",
 	"compute_net_wpm",
 	"elapsed_seconds",
+	"compute_consistency",
 ]
 
 
@@ -91,6 +92,28 @@ def compute_net_wpm(stats: LiveStats, now: Optional[float] = None) -> float:
 		return 0.0
 	effective = max(0, stats.correct_chars - stats.errors)
 	return (effective / 5.0) / _minutes(e)
+
+
+def compute_consistency(stats: LiveStats) -> float:
+	"""Return a basic consistency score 0..1 based on per-word durations.
+
+	Heuristic:
+	 - Use coefficient of variation (stdev / mean) of word durations (seconds)
+	 - Consistency = max(0, 1 - cv)
+	 - If fewer than 2 durations, return 0.0 (insufficient data)
+
+	This is an initial placeholder and can be refined (e.g. rolling windows,
+	per-word wpm variance) in future enhancements.
+	"""
+	from statistics import pstdev
+	if len(stats.word_durations) < 2:
+		return 0.0
+	mean = sum(stats.word_durations) / len(stats.word_durations)
+	if mean <= 0:
+		return 0.0
+	stdev = pstdev(stats.word_durations)
+	cv = stdev / mean if mean else 0.0
+	return max(0.0, min(1.0, 1.0 - cv))
 
 
 def make_mode_key(cfg: ModeConfig) -> str:

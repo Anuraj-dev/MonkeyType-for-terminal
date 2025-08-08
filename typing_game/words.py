@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from random import Random
-from typing import Generator, Iterable
+from typing import Generator
 
 PUNCTUATION = [",", ".", "?", "!", ";"]
 NUMBERS = [str(i) for i in range(10)]

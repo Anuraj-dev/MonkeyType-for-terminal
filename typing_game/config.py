@@ -14,10 +14,10 @@ Persistence is intentionally minimal JSON storing only primitive fields.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, asdict
-from pathlib import Path
-from typing import Optional, Any, Mapping
 import json
+from dataclasses import asdict, dataclass
+from pathlib import Path
+from typing import Any, Mapping, Optional
 
 # Public API re-export list
 

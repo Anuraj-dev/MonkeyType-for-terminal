@@ -5,12 +5,12 @@ Section 7 implementation providing factories and unified interface.
 
 from __future__ import annotations
 
-from typing import Iterable, Generator, Protocol, Callable
 from random import Random
+from typing import Protocol
 
 from .config import ModeConfig, validate_mode_config
 from .metrics import make_mode_key
-from .words import timed_word_stream, finite_word_stream, load_words
+from .words import finite_word_stream, load_words, timed_word_stream
 
 __all__ = [
 	"build_timed_mode",

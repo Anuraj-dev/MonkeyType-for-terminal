@@ -18,14 +18,15 @@ implemented in the engine milestone; here we focus on structure & pure logic.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Iterable, List, Sequence, Tuple
 import time
+from dataclasses import dataclass
+from types import ModuleType
+from typing import Any, List, Sequence, Tuple, Optional
 
 try:  # runtime optional import
 	import curses  # type: ignore
 except Exception:  # pragma: no cover - fallback path
-	curses = None  # sentinel for fallback mode
+	curses = None  # type: ignore[assignment]
 
 __all__ = [
 	"CursesSession",
@@ -37,6 +38,8 @@ __all__ = [
 	"normalize_key",
 	"is_printable_char",
 	"ResizeWatcher",
+	"THEMES",
+	"get_theme",
 ]
 
 # ------------------------- Color / Attribute handling -------------------------
@@ -45,6 +48,21 @@ COLOR_CORRECT = 1
 COLOR_WRONG = 2
 COLOR_DIM = 3
 COLOR_CARET = 4
+
+# ------------------------------ Theme Registry ------------------------------
+
+THEMES: dict[str, dict[str, int]] = {
+	"default": {
+		"correct": COLOR_CORRECT,
+		"wrong": COLOR_WRONG,
+		"dim": COLOR_DIM,
+		"caret": COLOR_CARET,
+	},
+	# Future themes could remap color IDs after initializing curses pairs
+}
+
+def get_theme(name: str = "default") -> dict[str, int]:
+	return THEMES.get(name, THEMES["default"])  # simple fallback
 
 
 def _init_colors():  # pragma: no cover (depends on terminal)
@@ -71,7 +89,7 @@ class CursesSession:
 			...
 	"""
 
-	screen: any = None
+	screen: Any = None
 	fallback: bool = False
 
 	def __enter__(self):  # pragma: no cover (curses specific)

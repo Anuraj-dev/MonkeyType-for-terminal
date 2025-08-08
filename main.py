@@ -18,17 +18,15 @@ from __future__ import annotations
 import argparse
 import os
 from pathlib import Path
-from typing import Optional
 
 from typing_game.config import (
-	load_last_config,
-	save_last_config,
-	merge_cli_args,
 	ModeConfig,
+	load_last_config,
+	merge_cli_args,
+	save_last_config,
 )
 from typing_game.engine import interactive_loop
 from typing_game.storage import load_highscores
-from typing_game.metrics import make_mode_key
 
 
 # ----------------------------- Highscore Helpers -----------------------------
@@ -79,9 +77,9 @@ def interactive_menu(base_cfg: ModeConfig) -> ModeConfig:  # pragma: no cover - 
 		elif choice == "4":
 			val = input("New punctuation probability [0-1]: ").strip()
 			try:
-				p = float(val)
-				if 0 <= p <= 1:
-					base_cfg.punctuation_prob = p
+				prob = float(val)
+				if 0 <= prob <= 1:
+					base_cfg.punctuation_prob = prob
 				else:
 					print("Out of range")
 			except ValueError:
@@ -91,9 +89,9 @@ def interactive_menu(base_cfg: ModeConfig) -> ModeConfig:  # pragma: no cover - 
 		elif choice == "6":
 			path = input("Path to word list file: ").strip()
 			if path:
-				p = Path(path)
-				if p.exists():
-					base_cfg.wordlist_path = p
+				path_obj = Path(path)
+				if path_obj.exists():
+					base_cfg.wordlist_path = path_obj
 				else:
 					print("File does not exist")
 		elif choice in {"q", "quit", "exit"}:

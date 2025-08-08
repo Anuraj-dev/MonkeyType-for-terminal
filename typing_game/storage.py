@@ -21,12 +21,12 @@ Data format on disk (JSON):
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from datetime import datetime, UTC
-from pathlib import Path
 import json
 import os
-from typing import Dict, List, Any
+from dataclasses import dataclass
+from datetime import UTC, datetime
+from pathlib import Path
+from typing import Any
 
 __all__ = [
 	"HighScoreEntry",

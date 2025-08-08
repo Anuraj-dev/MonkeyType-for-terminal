@@ -18,18 +18,29 @@ keystroke handling & curses integration will replace this in later milestones.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 import time
-from typing import Iterable, Iterator, Callable
+from dataclasses import dataclass
+from typing import Callable, Iterator, Optional
 
-from .metrics import LiveStats, update_on_char, compute_raw_wpm, compute_net_wpm
-from typing import Optional
-from .metrics import elapsed_seconds
-from .storage import HighScoreEntry, record_highscore, load_highscores
-from .modes import build_timed_mode, build_word_count_mode, mode_key
 from .config import ModeConfig, validate_mode_config
-from .words import load_words
-from .ui import highlight_word, wrap_words, build_header_line, build_progress_bar, CursesSession, normalize_key
+from .metrics import (
+	LiveStats,
+	compute_net_wpm,
+	compute_raw_wpm,
+	elapsed_seconds,
+	update_on_char,
+	compute_consistency,
+)
+from .modes import build_timed_mode, build_word_count_mode, mode_key
+from .storage import HighScoreEntry, load_highscores, record_highscore
+from .ui import (
+	CursesSession,
+	build_header_line,
+	build_progress_bar,
+	highlight_word,
+	normalize_key,
+	wrap_words,
+)
 from .utils import debug_log
 
 __all__ = [
@@ -49,6 +60,7 @@ class SessionResult:
 	highscore_new: bool
 
 	previous_best_net_wpm: Optional[float] = None
+	consistency: float = 0.0
 
 def _commit_word(stats: LiveStats, target: str, typed: str):
 	# update per-character stats for entire word + trailing space
@@ -93,11 +105,13 @@ def run_session(
 	if cfg.timed_seconds is not None:
 		mode = build_timed_mode(cfg.timed_seconds, punctuation_prob=cfg.punctuation_prob, numbers=cfg.numbers, wordlist_path=cfg.wordlist_path, top_n_highscores=cfg.top_n_highscores)
 	else:
+		assert cfg.word_count is not None
 		mode = build_word_count_mode(cfg.word_count, punctuation_prob=cfg.punctuation_prob, numbers=cfg.numbers, wordlist_path=cfg.wordlist_path, top_n_highscores=cfg.top_n_highscores)
 
 	words_iter = _iterate_mode_words(mode)
 	targets: list[str] = []
 	committed = 0
+	word_started_at = started
 
 	while True:
 		now = time_func()
@@ -119,6 +133,11 @@ def run_session(
 		if typed.strip() == "/quit":
 			break
 		_commit_word(stats, target, typed)
+		# record duration for this word
+		word_time = time_func() - word_started_at
+		if word_time >= 0:
+			stats.word_durations.append(word_time)
+		word_started_at = time_func()
 		committed += 1
 		# space char after word (simulate):
 		update_on_char(stats, True)  # treat separating space as correct char for wpm baseline
@@ -138,7 +157,8 @@ def run_session(
 		pass
 	entry = HighScoreEntry.create(key, net_wpm, acc, raw_wpm, stats.errors, stats.chars_typed)
 	highscore_new = record_highscore(key, entry, top_n=cfg.top_n_highscores)
-	return SessionResult(cfg, raw_wpm, net_wpm, acc, stats.errors, stats.chars_typed, elapsed, highscore_new, previous_best_net_wpm=prev_best)
+	consistency = compute_consistency(stats)
+	return SessionResult(cfg, raw_wpm, net_wpm, acc, stats.errors, stats.chars_typed, elapsed, highscore_new, previous_best_net_wpm=prev_best, consistency=consistency)
 
 
 def _clear_screen():  # pragma: no cover - simple utility
@@ -161,6 +181,8 @@ def end_screen(res: SessionResult):  # pragma: no cover - I/O convenience
 	print(f"Mode: {desc}")
 	print(f"Elapsed: {res.elapsed:.1f}s  Raw WPM: {res.raw_wpm:.2f}  Net WPM: {res.net_wpm:.2f}")
 	print(f"Accuracy: {res.accuracy*100:.2f}%  Errors: {res.errors}  Chars: {res.chars}")
+	if res.consistency > 0:
+		print(f"Consistency: {res.consistency*100:.1f}%")
 	if res.previous_best_net_wpm is not None:
 		print(f"Previous Best Net WPM: {res.previous_best_net_wpm:.2f}")
 	if res.highscore_new:
@@ -176,7 +198,7 @@ def _maybe_print_fallback_banner():  # pragma: no cover - simple UX hint
 	if _fallback_banner_printed:
 		return
 	try:
-		import curses  # type: ignore
+		__import__("curses")  # type: ignore  # imported for side-effect check only
 	except Exception:
 		print("[Plain Mode] Running without curses (limited live feedback).")
 		print("Install 'windows-curses' on Windows for full UI later.")
@@ -209,9 +231,9 @@ def _prompt_mode_change(current: ModeConfig) -> ModeConfig:  # pragma: no cover 
 	elif choice == "3":
 		val = input("New punctuation probability 0..1: ").strip()
 		try:
-			p = float(val)
-			if 0 <= p <= 1:
-				current.punctuation_prob = p
+			prob = float(val)
+			if 0 <= prob <= 1:
+				current.punctuation_prob = prob
 		except ValueError:
 			pass
 	elif choice == "4":
@@ -220,9 +242,9 @@ def _prompt_mode_change(current: ModeConfig) -> ModeConfig:  # pragma: no cover 
 		path = input("Word list path: ").strip()
 		if path:
 			from pathlib import Path
-			p = Path(path)
-			if p.exists():
-				current.wordlist_path = p
+			path_obj = Path(path)
+			if path_obj.exists():
+				current.wordlist_path = path_obj
 	return current
 
 
@@ -257,7 +279,7 @@ def _try_realtime_session(cfg: ModeConfig) -> SessionResult:
 	accuracy with live updates.
 	"""
 	try:
-		import curses  # type: ignore
+		__import__("curses")  # type: ignore  # imported for availability check
 	except Exception:  # curses not available
 		return run_session(cfg)
 	try:
@@ -272,6 +294,7 @@ def _run_session_curses(cfg: ModeConfig) -> SessionResult:  # pragma: no cover -
 	if cfg.timed_seconds is not None:
 		mode = build_timed_mode(cfg.timed_seconds, punctuation_prob=cfg.punctuation_prob, numbers=cfg.numbers, wordlist_path=cfg.wordlist_path, top_n_highscores=cfg.top_n_highscores)
 	else:
+		assert cfg.word_count is not None
 		mode = build_word_count_mode(cfg.word_count, punctuation_prob=cfg.punctuation_prob, numbers=cfg.numbers, wordlist_path=cfg.wordlist_path, top_n_highscores=cfg.top_n_highscores)
 
 	# Initialize state
@@ -281,6 +304,7 @@ def _run_session_curses(cfg: ModeConfig) -> SessionResult:  # pragma: no cover -
 	targets: list[str] = []
 	current_index = 0
 	typed_current = ""
+	word_started_at = started
 
 	with CursesSession() as scr:
 		# If fallback (scr is None) revert to plain
@@ -325,6 +349,11 @@ def _run_session_curses(cfg: ModeConfig) -> SessionResult:  # pragma: no cover -
 					_commit_word(stats, target, typed_current)
 					update_on_char(stats, True)  # space char baseline
 					current_index += 1
+					# record per-word duration
+					w_dur = time.monotonic() - word_started_at
+					if w_dur >= 0:
+						stats.word_durations.append(w_dur)
+					word_started_at = time.monotonic()
 					typed_current = ""
 				else:
 					# normal char
@@ -387,4 +416,5 @@ def _run_session_curses(cfg: ModeConfig) -> SessionResult:  # pragma: no cover -
 		pass
 	entry = HighScoreEntry.create(key, net_wpm, acc, raw_wpm, stats.errors, stats.chars_typed)
 	highscore_new = record_highscore(key, entry, top_n=cfg.top_n_highscores)
-	return SessionResult(cfg, raw_wpm, net_wpm, acc, stats.errors, stats.chars_typed, elapsed, highscore_new, previous_best_net_wpm=prev_best)
+	consistency = compute_consistency(stats)
+	return SessionResult(cfg, raw_wpm, net_wpm, acc, stats.errors, stats.chars_typed, elapsed, highscore_new, previous_best_net_wpm=prev_best, consistency=consistency)

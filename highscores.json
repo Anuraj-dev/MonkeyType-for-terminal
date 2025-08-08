@@ -1,1 +1,355 @@
-[]
+{
+  "modes": {
+    "words-3-p0-n0": [
+      {
+        "mode_key": "words-3-p0-n0",
+        "wpm": 0.0,
+        "accuracy": 0.3571,
+        "raw_wpm": 0.01,
+        "errors": 9,
+        "total_chars": 14,
+        "timestamp": "2025-08-08T15:50:24Z"
+      },
+      {
+        "mode_key": "words-3-p0-n0",
+        "wpm": 0.0,
+        "accuracy": 0.3571,
+        "raw_wpm": 0.01,
+        "errors": 9,
+        "total_chars": 14,
+        "timestamp": "2025-08-08T16:44:12Z"
+      },
+      {
+        "mode_key": "words-3-p0-n0",
+        "wpm": 0.0,
+        "accuracy": 0.2143,
+        "raw_wpm": 0.01,
+        "errors": 11,
+        "total_chars": 14,
+        "timestamp": "2025-08-08T15:50:32Z"
+      },
+      {
+        "mode_key": "words-3-p0-n0",
+        "wpm": 0.0,
+        "accuracy": 0.2143,
+        "raw_wpm": 0.01,
+        "errors": 11,
+        "total_chars": 14,
+        "timestamp": "2025-08-08T16:51:05Z"
+      },
+      {
+        "mode_key": "words-3-p0-n0",
+        "wpm": 0.0,
+        "accuracy": 0.2143,
+        "raw_wpm": 0.01,
+        "errors": 11,
+        "total_chars": 14,
+        "timestamp": "2025-08-08T17:04:36Z"
+      }
+    ],
+    "words-5-p0-n0": [
+      {
+        "mode_key": "words-5-p0-n0",
+        "wpm": 0.0,
+        "accuracy": 0.0,
+        "raw_wpm": 0.0,
+        "errors": 0,
+        "total_chars": 0,
+        "timestamp": "2025-08-08T15:50:32Z"
+      },
+      {
+        "mode_key": "words-5-p0-n0",
+        "wpm": 0.0,
+        "accuracy": 0.0,
+        "raw_wpm": 0.0,
+        "errors": 0,
+        "total_chars": 0,
+        "timestamp": "2025-08-08T16:44:12Z"
+      },
+      {
+        "mode_key": "words-5-p0-n0",
+        "wpm": 0.0,
+        "accuracy": 0.0,
+        "raw_wpm": 0.0,
+        "errors": 0,
+        "total_chars": 0,
+        "timestamp": "2025-08-08T16:51:05Z"
+      },
+      {
+        "mode_key": "words-5-p0-n0",
+        "wpm": 0.0,
+        "accuracy": 0.0,
+        "raw_wpm": 0.0,
+        "errors": 0,
+        "total_chars": 0,
+        "timestamp": "2025-08-08T17:04:36Z"
+      }
+    ],
+    "timed-60-p0-n0": [
+      {
+        "mode_key": "timed-60-p0-n0",
+        "wpm": 24.49,
+        "accuracy": 0.9851,
+        "raw_wpm": 25.24,
+        "errors": 2,
+        "total_chars": 134,
+        "timestamp": "2025-08-08T15:53:52Z"
+      },
+      {
+        "mode_key": "timed-60-p0-n0",
+        "wpm": 24.24,
+        "accuracy": 0.9697,
+        "raw_wpm": 25.8,
+        "errors": 4,
+        "total_chars": 132,
+        "timestamp": "2025-08-08T15:52:38Z"
+      },
+      {
+        "mode_key": "timed-60-p0-n0",
+        "wpm": 0.0,
+        "accuracy": 0.4174,
+        "raw_wpm": 86.96,
+        "errors": 254,
+        "total_chars": 436,
+        "timestamp": "2025-08-08T15:55:03Z"
+      }
+    ],
+    "timed-5-p0-n0": [
+      {
+        "mode_key": "timed-5-p0-n0",
+        "wpm": 8.6,
+        "accuracy": 1.0,
+        "raw_wpm": 8.6,
+        "errors": 0,
+        "total_chars": 5,
+        "timestamp": "2025-08-08T16:09:34Z"
+      },
+      {
+        "mode_key": "timed-5-p0-n0",
+        "wpm": 4.44,
+        "accuracy": 1.0,
+        "raw_wpm": 4.44,
+        "errors": 0,
+        "total_chars": 3,
+        "timestamp": "2025-08-08T16:09:20Z"
+      }
+    ],
+    "timed-10-p0-n0": [
+      {
+        "mode_key": "timed-10-p0-n0",
+        "wpm": 42.92,
+        "accuracy": 1.0,
+        "raw_wpm": 42.92,
+        "errors": 0,
+        "total_chars": 36,
+        "timestamp": "2025-08-08T16:20:42Z"
+      },
+      {
+        "mode_key": "timed-10-p0-n0",
+        "wpm": 24.76,
+        "accuracy": 1.0,
+        "raw_wpm": 24.76,
+        "errors": 0,
+        "total_chars": 21,
+        "timestamp": "2025-08-08T16:12:17Z"
+      },
+      {
+        "mode_key": "timed-10-p0-n0",
+        "wpm": 23.54,
+        "accuracy": 1.0,
+        "raw_wpm": 23.54,
+        "errors": 0,
+        "total_chars": 21,
+        "timestamp": "2025-08-08T16:12:32Z"
+      },
+      {
+        "mode_key": "timed-10-p0-n0",
+        "wpm": 18.53,
+        "accuracy": 1.0,
+        "raw_wpm": 18.53,
+        "errors": 0,
+        "total_chars": 18,
+        "timestamp": "2025-08-08T16:13:14Z"
+      },
+      {
+        "mode_key": "timed-10-p0-n0",
+        "wpm": 10.68,
+        "accuracy": 0.5918,
+        "raw_wpm": 58.15,
+        "errors": 20,
+        "total_chars": 49,
+        "timestamp": "2025-08-08T16:34:55Z"
+      },
+      {
+        "mode_key": "timed-10-p0-n0",
+        "wpm": 7.18,
+        "accuracy": 0.875,
+        "raw_wpm": 9.57,
+        "errors": 1,
+        "total_chars": 8,
+        "timestamp": "2025-08-08T16:34:28Z"
+      },
+      {
+        "mode_key": "timed-10-p0-n0",
+        "wpm": 4.71,
+        "accuracy": 1.0,
+        "raw_wpm": 4.71,
+        "errors": 0,
+        "total_chars": 4,
+        "timestamp": "2025-08-08T16:40:19Z"
+      },
+      {
+        "mode_key": "timed-10-p0-n0",
+        "wpm": 4.53,
+        "accuracy": 0.6111,
+        "raw_wpm": 20.41,
+        "errors": 7,
+        "total_chars": 18,
+        "timestamp": "2025-08-08T16:12:52Z"
+      },
+      {
+        "mode_key": "timed-10-p0-n0",
+        "wpm": 3.29,
+        "accuracy": 0.5217,
+        "raw_wpm": 75.77,
+        "errors": 33,
+        "total_chars": 69,
+        "timestamp": "2025-08-08T16:22:08Z"
+      },
+      {
+        "mode_key": "timed-10-p0-n0",
+        "wpm": 2.24,
+        "accuracy": 1.0,
+        "raw_wpm": 2.24,
+        "errors": 0,
+        "total_chars": 2,
+        "timestamp": "2025-08-08T16:21:40Z"
+      },
+      {
+        "mode_key": "timed-10-p0-n0",
+        "wpm": 0.98,
+        "accuracy": 1.0,
+        "raw_wpm": 0.98,
+        "errors": 0,
+        "total_chars": 1,
+        "timestamp": "2025-08-08T16:40:44Z"
+      },
+      {
+        "mode_key": "timed-10-p0-n0",
+        "wpm": 0.0,
+        "accuracy": 0.5,
+        "raw_wpm": 78.01,
+        "errors": 33,
+        "total_chars": 66,
+        "timestamp": "2025-08-08T16:21:29Z"
+      },
+      {
+        "mode_key": "timed-10-p0-n0",
+        "wpm": 0.0,
+        "accuracy": 0.493,
+        "raw_wpm": 79.55,
+        "errors": 36,
+        "total_chars": 71,
+        "timestamp": "2025-08-08T16:23:16Z"
+      },
+      {
+        "mode_key": "timed-10-p0-n0",
+        "wpm": 0.0,
+        "accuracy": 0.3333,
+        "raw_wpm": 3.28,
+        "errors": 2,
+        "total_chars": 3,
+        "timestamp": "2025-08-08T16:40:06Z"
+      }
+    ],
+    "words-10-p0-n0": [
+      {
+        "mode_key": "words-10-p0-n0",
+        "wpm": 122.24,
+        "accuracy": 1.0,
+        "raw_wpm": 122.24,
+        "errors": 0,
+        "total_chars": 10,
+        "timestamp": "2025-08-08T16:14:09Z"
+      },
+      {
+        "mode_key": "words-10-p0-n0",
+        "wpm": 72.6,
+        "accuracy": 1.0,
+        "raw_wpm": 72.6,
+        "errors": 0,
+        "total_chars": 10,
+        "timestamp": "2025-08-08T16:14:14Z"
+      },
+      {
+        "mode_key": "words-10-p0-n0",
+        "wpm": 54.98,
+        "accuracy": 1.0,
+        "raw_wpm": 54.98,
+        "errors": 0,
+        "total_chars": 10,
+        "timestamp": "2025-08-08T16:14:16Z"
+      },
+      {
+        "mode_key": "words-10-p0-n0",
+        "wpm": 39.22,
+        "accuracy": 1.0,
+        "raw_wpm": 39.22,
+        "errors": 0,
+        "total_chars": 10,
+        "timestamp": "2025-08-08T16:14:12Z"
+      },
+      {
+        "mode_key": "words-10-p0-n0",
+        "wpm": 18.32,
+        "accuracy": 0.8696,
+        "raw_wpm": 24.78,
+        "errors": 3,
+        "total_chars": 23,
+        "timestamp": "2025-08-08T16:13:48Z"
+      },
+      {
+        "mode_key": "words-10-p0-n0",
+        "wpm": 10.72,
+        "accuracy": 0.8261,
+        "raw_wpm": 16.44,
+        "errors": 4,
+        "total_chars": 23,
+        "timestamp": "2025-08-08T16:14:05Z"
+      }
+    ],
+    "timed-15-p0-n0": [
+      {
+        "mode_key": "timed-15-p0-n0",
+        "wpm": 28.52,
+        "accuracy": 1.0,
+        "raw_wpm": 28.52,
+        "errors": 0,
+        "total_chars": 37,
+        "timestamp": "2025-08-08T16:29:00Z"
+      }
+    ],
+    "timed-2-p0-n0": [
+      {
+        "mode_key": "timed-2-p0-n0",
+        "wpm": 3.21,
+        "accuracy": 1.0,
+        "raw_wpm": 3.21,
+        "errors": 0,
+        "total_chars": 1,
+        "timestamp": "2025-08-08T16:41:00Z"
+      }
+    ],
+    "timed-40-p0-n0": [
+      {
+        "mode_key": "timed-40-p0-n0",
+        "wpm": 20.55,
+        "accuracy": 0.9157,
+        "raw_wpm": 24.72,
+        "errors": 7,
+        "total_chars": 83,
+        "timestamp": "2025-08-08T17:04:28Z"
+      }
+    ]
+  }
+}

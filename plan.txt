@@ -167,35 +167,35 @@ Legend:
  - [~] Initial real-time curses loop (prototype; no backspace stat rollback, blocking getch avoided with nodelay)
 
 ## 16. Quality Gates
-- [ ] Lint (flake8 / ruff)
-- [ ] Formatting (black / ruff format)
-- [ ] Type hints (mypy)
-- [ ] Unit test pass
-- [ ] Manual play sessions (timed, word-count)
-- [ ] Highscore file integrity after multiple sessions
+- [x] Lint (ruff clean under chosen ignores)
+- [ ] Formatting (black / ruff format) (Deferred: tabs retained, long lines allowed)
+- [x] Type hints (mypy clean)
+- [x] Unit test pass (36 tests)
+- [x] Manual play sessions (timed & word-count exercised; highscores populated)
+- [x] Highscore file integrity after multiple sessions (JSON loads, ordering preserved)
 
 ## 17. Testing Plan
-- [ ] metrics: WPM > 0 after first char
-- [ ] metrics: accuracy 100% on all correct
-- [ ] metrics: accuracy < 100% with errors
-- [ ] storage: new highscore insertion
-- [ ] storage: tie with better accuracy wins
-- [ ] words: punctuation probability (statistical; skip if flaky)
-- [ ] config: invalid probability raises
-- [ ] engine (partial, abstract functions) mock time progression
-- [ ] utils: formatting & progress bar
+- [x] metrics: WPM > 0 after first char (covered in test_wpm_nonzero)
+- [x] metrics: accuracy 100% on all correct / <100% with errors
+- [x] storage: new highscore insertion & ordering, truncation, corrupt load fallback
+- [x] storage: tie with better accuracy wins (ordering test)
+- [x] words: punctuation probability edge cases (0 prob), streams length & randomness
+- [x] config: invalid probability / conflicts raise
+- [x] engine: basic run_session word-count & quit path
+- [x] utils/UI: progress bar bounds, wrap_words, highlight caret, header line
+- [ ] (Future) statistical punctuation probability test (could be flaky)
 
 ## 18. Documentation
-- [ ] README: project description
-- [ ] Usage examples
-- [ ] Dependencies install
-- [ ] Windows note (windows-curses)
-- [ ] Metric formulas explanation
-- [ ] Roadmap section linking to this plan
+- [x] README: project description
+- [x] Usage examples
+- [x] Dependencies install
+- [x] Windows note (windows-curses)
+- [x] Metric formulas explanation
+- [x] Roadmap section linking to this plan
 
 ## 19. Stretch Enhancements
-- [ ] Consistency metric (stdev of per-word speeds)
-- [ ] Themes (color palettes)
+- [~] Consistency metric (basic coefficient of variation placeholder added)
+- [~] Themes (simple theme registry scaffold)
 - [ ] Quote mode
 - [ ] Custom text file mode
 - [ ] Streak tracking

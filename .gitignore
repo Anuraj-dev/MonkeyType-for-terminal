@@ -49,3 +49,6 @@ highscores.json
 
 #Else
 tests
+*.ruff_cache
+mypy.ini
+ruff.toml

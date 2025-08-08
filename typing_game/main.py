@@ -11,13 +11,11 @@ Later milestones will add curses real-time UI; this CLI presently runs the line-
 from __future__ import annotations
 
 import argparse
-from pathlib import Path
 from typing import Optional
 
-from .config import default_config, merge_cli_args, ModeConfig
-from .engine import interactive_loop, run_session, end_screen
+from .config import ModeConfig, default_config, merge_cli_args
+from .engine import end_screen, run_session
 from .storage import get_top_highscores, load_highscores
-from .metrics import make_mode_key
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -38,7 +36,7 @@ def print_highscores(limit: int = 10):  # pragma: no cover - output
         print("No highscores yet.")
         return
     print("=== Highscores ===")
-    for mode_key, entries in store.items():
+    for mode_key, _entries in store.items():  # loop variable unused
         print(f"[{mode_key}]")
         ordered = get_top_highscores(mode_key, limit=limit)
         for i, e in enumerate(ordered, 1):
