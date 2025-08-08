@@ -128,11 +128,11 @@ Legend:
 - [x] Debounce rendering on resize (ResizeWatcher)
 
 ## 11. End Screen
-- [ ] Display: WPM, Raw WPM, Accuracy, Errors, Words, Duration
-- [ ] Indicate if new personal best
-- [ ] Show previous best for comparison
-- [ ] Prompt options (R/M/Q)
-- [ ] Clear screen before/after
+- [x] Display: WPM, Raw WPM, Accuracy, Errors, Words, Duration
+- [x] Indicate if new personal best
+- [x] Show previous best for comparison
+- [x] Prompt options (R/M/Q) (R/Q implemented; mode change later)
+- [x] Clear screen before/after
 
 ## 12. Highscore Integration
 - [ ] Acquire mode key after session

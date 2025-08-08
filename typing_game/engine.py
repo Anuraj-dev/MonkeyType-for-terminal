@@ -23,6 +23,7 @@ import time
 from typing import Iterable, Iterator
 
 from .metrics import LiveStats, update_on_char, compute_raw_wpm, compute_net_wpm
+from typing import Optional
 from .metrics import elapsed_seconds
 from .storage import HighScoreEntry, record_highscore
 from .modes import build_timed_mode, build_word_count_mode, mode_key
@@ -45,6 +46,7 @@ class SessionResult:
 	elapsed: float
 	highscore_new: bool
 
+	previous_best_net_wpm: Optional[float] = None
 
 def _commit_word(stats: LiveStats, target: str, typed: str):
 	# update per-character stats for entire word + trailing space
@@ -114,21 +116,39 @@ def run_session(cfg: ModeConfig) -> SessionResult:
 	return SessionResult(cfg, raw_wpm, net_wpm, acc, stats.errors, stats.chars_typed, elapsed, highscore_new)
 
 
-def print_summary(res: SessionResult):  # pragma: no cover - I/O convenience
-	print("\n--- Session Summary ---")
-	print(f"Mode: {res.mode_config.mode_kind()}  Elapsed: {res.elapsed:.1f}s")
-	print(f"Raw WPM: {res.raw_wpm:.2f}  Net WPM: {res.net_wpm:.2f}  Accuracy: {res.accuracy*100:.2f}%  Errors: {res.errors}  Chars: {res.chars}")
+def _clear_screen():  # pragma: no cover - simple utility
+	import os
+	cmd = "cls" if os.name == "nt" else "clear"
+	try:
+		os.system(cmd)
+	except Exception:
+		print("\n" * 3)
+
+
+def end_screen(res: SessionResult):  # pragma: no cover - I/O convenience
+	_clear_screen()
+	print("=== Typing Session Summary ===")
+	kind = res.mode_config.mode_kind()
+	if kind == "timed":
+		desc = f"Timed {res.mode_config.timed_seconds}s"
+	else:
+		desc = f"Words {res.mode_config.word_count}"
+	print(f"Mode: {desc}")
+	print(f"Elapsed: {res.elapsed:.1f}s  Raw WPM: {res.raw_wpm:.2f}  Net WPM: {res.net_wpm:.2f}")
+	print(f"Accuracy: {res.accuracy*100:.2f}%  Errors: {res.errors}  Chars: {res.chars}")
+	if res.previous_best_net_wpm is not None:
+		print(f"Previous Best Net WPM: {res.previous_best_net_wpm:.2f}")
 	if res.highscore_new:
-		print("New highscore recorded!")
+		print("*** NEW HIGHSCORE! ***")
+	print("==============================")
 
 
 def interactive_loop(initial_cfg: ModeConfig):  # pragma: no cover - user interaction
 	cfg = initial_cfg
 	while True:
 		res = run_session(cfg)
-		print_summary(res)
+		end_screen(res)
 		choice = input("(R)estart same / (Q)uit? ").strip().lower()
 		if choice.startswith("q"):
 			break
-		# restart same config
 		continue
