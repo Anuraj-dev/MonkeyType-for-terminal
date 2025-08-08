@@ -1,0 +1,3 @@
+# Core dependencies (minimal for bootstrap)
+# On Windows ensure windows-curses is installed for curses support
+windows-curses; platform_system == "Windows"

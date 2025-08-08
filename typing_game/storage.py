@@ -1,0 +1,1 @@
+"""Highscore storage handling (stub)."""

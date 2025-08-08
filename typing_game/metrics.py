@@ -1,0 +1,1 @@
+"""Metrics computation layer (stub)."""

@@ -1,0 +1,243 @@
+# Terminal Typing Game Project Plan (Monkeytype-inspired)
+
+Legend:
+[ ] = not started   [~] = in progress   [x] = done   [!] = needs attention / blocker
+
+## 0. High-Level Milestones
+- [ ] M1: Skeleton + word loading (basic text loop, no curses)
+- [ ] M2: Real-time curses UI (highlighting, live stats)
+- [ ] M3: Accurate metrics + end summary
+- [ ] M4: Highscore persistence (JSON) + mode separation
+- [ ] M5: Config + CLI + fallback non-curses mode
+- [ ] M6: Extended modes (punctuation, numbers, word-count & timed parity)
+- [ ] M7: Refactor + tests + resilience
+- [ ] M8: Enhancements (consistency, progress bar, theming)
+- [ ] M9: Advanced features (adaptive difficulty, streaks)
+- [ ] Release v1.0 (M1–M5 complete, stable & tested)
+
+## 1. Project Bootstrap
+- [x] Create package structure `typing_game/`
+  - [x] __init__.py
+  - [x] main.py
+  - [x] engine.py
+  - [x] ui.py
+  - [x] metrics.py
+  - [x] words.py
+  - [x] storage.py
+  - [x] config.py
+  - [x] modes.py
+  - [x] utils.py
+- [x] Create `data/wordlists/english_1k.txt`
+- [x] Create empty `highscores.json` or let code generate
+- [x] Add `requirements.txt` (windows-curses (Windows only), optional rich later)
+- [x] Write README stub
+- [ ] Git init + first commit
+
+## 2. Core Data Models
+- [ ] Define `ModeConfig` dataclass
+- [ ] Define `HighScoreEntry` dataclass
+- [ ] Define `LiveStats` dataclass
+- [ ] Implement `make_mode_key(cfg)`
+- [ ] Validation helpers (e.g., assert timed xor word-count)
+
+## 3. Word Handling (`words.py`)
+- [ ] Load base list (cache in module variable)
+- [ ] Shuffle logic
+- [ ] Generator for timed (infinite) mode
+- [ ] Generator for word-count mode (finite)
+- [ ] Optional punctuation injection
+  - [ ] Config probability
+  - [ ] Keep correctness mapping
+- [ ] Optional numbers injection
+- [ ] Difficulty future hook (length buckets)
+- [ ] Unit tests (word count, punctuation probability rough check)
+
+## 4. Metrics Layer (`metrics.py`)
+- [ ] Time source uses `time.monotonic()`
+- [ ] Incremental update: on char typed
+- [ ] Accuracy formula
+- [ ] Raw WPM
+- [ ] Net/Gross decision + docstring explaining formula
+- [ ] Consistency placeholder (per-word durations list)
+- [ ] Edge: safeguard divide-by-zero
+- [ ] Unit tests for WPM + accuracy
+
+## 5. Storage (`storage.py`)
+- [ ] Path resolution (local file / user home fallback)
+- [ ] Load highscores (graceful if missing/corrupt)
+- [ ] Insert logic (sorted by WPM desc, tie accuracy)
+- [ ] Truncate list to top N (configurable)
+- [ ] Atomic write (temp file replace)
+- [ ] Function `record_highscore(mode_key, entry) -> bool`
+- [ ] Unit tests (insert ordering, tie-breaking, truncation)
+
+## 6. Configuration (`config.py`)
+- [ ] Default config loader
+- [ ] CLI merge function
+- [ ] Persistence of last used settings (optional file)
+- [ ] Validate:
+  - [ ] duration > 0
+  - [ ] wordlist exists
+  - [ ] punctuation probability in [0,1]
+- [ ] Provide `get_or_create_config_path()`
+- [ ] Unit tests for merges
+
+## 7. Modes (`modes.py`)
+- [ ] Factory: build timed config from seconds
+- [ ] Factory: build word-count config
+- [ ] Abstraction: unify interface (yield words, end condition function)
+- [ ] Mode key standardization
+- [ ] Unit tests (mode key structure)
+
+## 8. UI Layer (`ui.py`)
+- [ ] Curses initialization + teardown (context manager)
+- [ ] Color pairs (correct, wrong, dim, caret)
+- [ ] Terminal size measurement
+- [ ] Render header (mode, list, time, WPM, accuracy, errors)
+- [ ] Render word area (wrap aware)
+- [ ] Highlight:
+  - [ ] Correct chars (green)
+  - [ ] Incorrect chars (red)
+  - [ ] Current target char (underline or reverse)
+- [ ] Progress bar (time or words)
+- [ ] Throttle updates (e.g., >= 60ms)
+- [ ] Fallback plain mode if curses not available
+- [ ] Unit test (if practical) for text segmentation (pure functions only)
+
+## 9. Engine (`engine.py`)
+- [ ] Initialize stats + timers
+- [ ] Word acquisition
+- [ ] Input loop (non-blocking getch)
+- [ ] Backspace handling
+- [ ] Space triggers word commit
+- [ ] End conditions:
+  - [ ] Timed: exact moment time hits limit (stop immediately)
+  - [ ] Word-count: after last word commit
+- [ ] Early quit (ESC/Q)
+- [ ] Compute final metrics
+- [ ] Call highscore persistence
+- [ ] End screen rendering
+- [ ] Option: restart / change mode / quit
+- [ ] Escape hatch for exceptions (restore terminal)
+- [ ] Manual smoke test script notes
+
+## 10. Input & Event Handling
+- [ ] Map key codes (backspace variations: 8, 127)
+- [ ] Filter control characters
+- [ ] Handle window resize (SIGWINCH if supported; else periodic size check)
+- [ ] Debounce rendering on resize
+
+## 11. End Screen
+- [ ] Display: WPM, Raw WPM, Accuracy, Errors, Words, Duration
+- [ ] Indicate if new personal best
+- [ ] Show previous best for comparison
+- [ ] Prompt options (R/M/Q)
+- [ ] Clear screen before/after
+
+## 12. Highscore Integration
+- [ ] Acquire mode key after session
+- [ ] Generate entry
+- [ ] Insert + detect new record
+- [ ] Provide top N retrieval for potential future display
+- [ ] Add human-readable date (ISO timestamp)
+
+## 13. CLI (`main.py`)
+- [ ] argparse for
+  - [ ] --timed SECONDS
+  - [ ] --words COUNT
+  - [ ] --list WORDLIST
+  - [ ] --punct FLOAT
+  - [ ] --numbers
+  - [ ] --show-highscores
+- [ ] If no args → interactive menu
+- [ ] Help text clarity
+- [ ] Dispatch to engine
+
+## 14. Fallback Plain Mode
+- [ ] Detect if curses import fails
+- [ ] Provide simplified line-based test mode (no live WPM)
+- [ ] Warn user to install `windows-curses` on Windows
+
+## 15. Performance & Stability
+- [ ] Use diff or partial re-render
+- [ ] Limit allocations in hot path (reuse buffers)
+- [ ] Ensure no blocking I/O inside render loop
+- [ ] Use try/finally for terminal restore
+- [ ] Logging (optional) behind debug flag
+
+## 16. Quality Gates
+- [ ] Lint (flake8 / ruff)
+- [ ] Formatting (black / ruff format)
+- [ ] Type hints (mypy optional)
+- [ ] Unit test pass
+- [ ] Manual play sessions (timed, word-count)
+- [ ] Highscore file integrity after multiple sessions
+
+## 17. Testing Plan
+- [ ] metrics: WPM > 0 after first char
+- [ ] metrics: accuracy 100% on all correct
+- [ ] metrics: accuracy < 100% with errors
+- [ ] storage: new highscore insertion
+- [ ] storage: tie with better accuracy wins
+- [ ] words: punctuation probability (statistical; skip if flaky)
+- [ ] config: invalid probability raises
+- [ ] engine (partial, abstract functions) mock time progression
+- [ ] utils: formatting & progress bar
+
+## 18. Documentation
+- [ ] README: project description
+- [ ] Usage examples
+- [ ] Dependencies install
+- [ ] Windows note (windows-curses)
+- [ ] Metric formulas explanation
+- [ ] Roadmap section linking to this plan
+
+## 19. Stretch Enhancements
+- [ ] Consistency metric (stdev of per-word speeds)
+- [ ] Themes (color palettes)
+- [ ] Quote mode
+- [ ] Custom text file mode
+- [ ] Streak tracking
+- [ ] Achievement badges
+- [ ] Adaptive difficulty
+- [ ] Ghost replay overlay
+- [ ] Export session history (CSV/JSON)
+- [ ] Graph historical WPM (ASCII chart)
+- [ ] Plugin architecture for word providers
+
+## 20. Future Technical Debt to Watch
+- [ ] Coupling of engine & UI (keep boundaries crisp)
+- [ ] Global state in storage (avoid singletons)
+- [ ] Word generator side effects
+- [ ] Over-render frequency (FPS control)
+- [ ] Large highscore file growth (cap per mode)
+
+## 21. Risk & Mitigation
+- [ ] Windows curses quirk → Provide fallback
+- [ ] Terminal resize distortion → Recompute layout each frame
+- [ ] Corrupt highscores.json → Validate & rebuild
+- [ ] Performance dips on huge word lists → Cache + lazy slice
+- [ ] Inconsistent time if using time.time() → Use monotonic()
+
+## 22. Verification Checklist Before v1.0
+- [ ] Start game timed 60s without args (menu)
+- [ ] Start game word-count 50
+- [ ] Highscore persists + updates
+- [ ] Punctuation off by default
+- [ ] Numbers flag works
+- [ ] Accuracy correct on forced errors
+- [ ] WPM stable vs external stopwatch (~margin < 1%)
+- [ ] Graceful CTRL+C restore terminal
+- [ ] Fallback mode runs if curses missing
+
+## 23. Nice-to-Have Tooling
+- [ ] Makefile / tasks (format, lint, test)
+- [ ] Pre-commit hooks
+- [ ] Coverage report
+- [ ] Simple benchmark script (simulate keystrokes)
+
+## 24. Daily Progress Log (append entries)
+- [ ] (YYYY-MM-DD) ...
+
+--- 
+(End of plan.txt)
