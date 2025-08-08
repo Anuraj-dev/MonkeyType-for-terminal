@@ -26,19 +26,25 @@ from typing_game.config import (
 	ModeConfig,
 )
 from typing_game.engine import interactive_loop
-from typing_game.storage import get_top_highscores
+from typing_game.storage import load_highscores
 from typing_game.metrics import make_mode_key
 
 
 # ----------------------------- Highscore Helpers -----------------------------
 def print_highscores(limit: int = 25):  # pragma: no cover - output helper
-	print("=== Highscores (top) ===")
-	entries = get_top_highscores(limit=limit)
-	if not entries:
+	print("=== Highscores ===")
+	store = load_highscores()
+	if not store:
 		print("(none recorded yet)")
 		return
-	for i, e in enumerate(entries, 1):
-		print(f"{i:2d}. {e.mode_key:20s} net={e.net_wpm:.2f} raw={e.raw_wpm:.2f} acc={e.accuracy*100:.1f}% errors={e.errors}")
+	# Sort mode keys alphabetically for stable display
+	for mk in sorted(store.keys()):
+		entries = store[mk]
+		ordered = sorted(entries, key=lambda e: (-e.wpm, -e.accuracy, e.timestamp))[:limit]
+		print(f"-- {mk} (top {len(ordered)}) --")
+		for i, e in enumerate(ordered, 1):
+			print(f" {i:2d}. net={e.wpm:.2f} raw={e.raw_wpm:.2f} acc={e.accuracy*100:.1f}% errors={e.errors} chars={e.total_chars} time={e.timestamp}")
+	print("==================")
 
 
 # ------------------------------- Interactive Menu ----------------------------
