@@ -122,10 +122,10 @@ Legend:
 - [ ] Manual smoke test script notes (add later)
 
 ## 10. Input & Event Handling
-- [ ] Map key codes (backspace variations: 8, 127)
-- [ ] Filter control characters
-- [ ] Handle window resize (SIGWINCH if supported; else periodic size check)
-- [ ] Debounce rendering on resize
+- [x] Map key codes (backspace variations: 8, 127)
+- [x] Filter control characters
+- [x] Handle window resize (SIGWINCH if supported; else periodic size check) (poll watcher)
+- [x] Debounce rendering on resize (ResizeWatcher)
 
 ## 11. End Screen
 - [ ] Display: WPM, Raw WPM, Accuracy, Errors, Words, Duration

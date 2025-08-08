@@ -34,6 +34,9 @@ __all__ = [
 	"build_progress_bar",
 	"highlight_word",
 	"build_header_line",
+	"normalize_key",
+	"is_printable_char",
+	"ResizeWatcher",
 ]
 
 # ------------------------- Color / Attribute handling -------------------------
@@ -204,3 +207,63 @@ def render_curses_example(screen, text: str, row: int = 0):  # pragma: no cover 
 
 # NOTE: Full interactive UI integration (input + dynamic layout) will be added
 # in later engine/UI milestones.
+
+
+# ----------------------- Input Normalization Utilities ----------------------
+
+BACKSPACE_CODES = {8, 127}
+
+
+def normalize_key(key: int) -> str | None:
+	"""Normalize a curses key code / ordinal to semantic token or char.
+
+	Returns one of:
+	  - 'BACKSPACE'
+	  - 'RESIZE'
+	  - single-character string for printable characters
+	  - None for ignored control keys
+	"""
+	if key in BACKSPACE_CODES:
+		return "BACKSPACE"
+	if curses and key == getattr(curses, "KEY_RESIZE", -9999):
+		return "RESIZE"
+	# Curses may return negative for special keys; ignore others for now
+	if key < 0:
+		return None
+	if 32 <= key < 127:  # printable ASCII
+		return chr(key)
+	return None
+
+
+def is_printable_char(ch: str) -> bool:
+	return len(ch) == 1 and 32 <= ord(ch) < 127
+
+
+# ---------------------------- Resize Watcher ----------------------------
+
+class ResizeWatcher:
+	"""Track terminal size changes with debounce.
+
+	Poll-based approach for environments where KEY_RESIZE not relied upon.
+	"""
+
+	def __init__(self, debounce_sec: float = 0.15):
+		self.debounce = debounce_sec
+		self._last_emit = 0.0
+		self._last_size: tuple[int, int] | None = None  # (rows, cols)
+
+	def check(self) -> tuple[bool, tuple[int, int] | None]:  # pragma: no cover (needs terminal)
+		if not curses:
+			return False, None
+		rows, cols = curses.LINES, curses.COLS
+		size = (rows, cols)
+		if self._last_size is None:
+			self._last_size = size
+			return True, size
+		if size != self._last_size:
+			now = time.monotonic()
+			if now - self._last_emit >= self.debounce:
+				self._last_size = size
+				self._last_emit = now
+				return True, size
+		return False, None
