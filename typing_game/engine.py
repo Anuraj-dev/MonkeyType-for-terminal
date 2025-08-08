@@ -20,12 +20,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import time
-from typing import Iterable, Iterator
+from typing import Iterable, Iterator, Callable
 
 from .metrics import LiveStats, update_on_char, compute_raw_wpm, compute_net_wpm
 from typing import Optional
 from .metrics import elapsed_seconds
-from .storage import HighScoreEntry, record_highscore
+from .storage import HighScoreEntry, record_highscore, load_highscores
 from .modes import build_timed_mode, build_word_count_mode, mode_key
 from .config import ModeConfig, validate_mode_config
 from .words import load_words
@@ -64,13 +64,28 @@ def _iterate_mode_words(mode) -> Iterator[str]:
 	return iter(w)
 
 
-def run_session(cfg: ModeConfig) -> SessionResult:
+def run_session(
+	cfg: ModeConfig,
+	*,
+	input_func: Callable[[str], str] | None = None,
+	time_func: Callable[[], float] | None = None,
+) -> SessionResult:
 	"""Run a typing session in plain stdin loop.
 
-	Returns SessionResult after completion or early quit.
+	Parameters:
+		cfg: Mode configuration.
+		input_func: (testing) function to obtain user input; defaults to built-in input.
+		time_func: (testing) monotonic time function returning float seconds; defaults to time.monotonic.
+
+	Returns:
+		SessionResult summary of the session.
 	"""
 	validate_mode_config(cfg)
-	started = time.monotonic()
+	if time_func is None:
+		time_func = time.monotonic
+	if input_func is None:
+		input_func = input  # pragma: no cover - real interactive path
+	started = time_func()
 	stats = LiveStats(started_at=started, last_update=started)
 
 	if cfg.timed_seconds is not None:
@@ -83,7 +98,7 @@ def run_session(cfg: ModeConfig) -> SessionResult:
 	committed = 0
 
 	while True:
-		now = time.monotonic()
+		now = time_func()
 		if cfg.timed_seconds is not None and elapsed_seconds(stats, now) >= cfg.timed_seconds:
 			break
 		if cfg.word_count is not None and committed >= cfg.word_count:
@@ -98,7 +113,7 @@ def run_session(cfg: ModeConfig) -> SessionResult:
 		prompt = f"[{committed+1}] {target}"
 		if remaining_time is not None:
 			prompt += f" ({remaining_time:.1f}s left)"
-		typed = input(prompt + ": ")
+		typed = input_func(prompt + ": ")
 		if typed.strip() == "/quit":
 			break
 		_commit_word(stats, target, typed)
@@ -111,9 +126,17 @@ def run_session(cfg: ModeConfig) -> SessionResult:
 	net_wpm = compute_net_wpm(stats)
 	acc = stats.accuracy()
 	key = mode_key(cfg)
+	# previous best lookup BEFORE recording new score
+	prev_best: Optional[float] = None
+	try:
+		store = load_highscores()
+		if key in store and store[key]:
+			prev_best = max((e.wpm for e in store[key]), default=None)
+	except Exception:
+		pass
 	entry = HighScoreEntry.create(key, net_wpm, acc, raw_wpm, stats.errors, stats.chars_typed)
 	highscore_new = record_highscore(key, entry, top_n=cfg.top_n_highscores)
-	return SessionResult(cfg, raw_wpm, net_wpm, acc, stats.errors, stats.chars_typed, elapsed, highscore_new)
+	return SessionResult(cfg, raw_wpm, net_wpm, acc, stats.errors, stats.chars_typed, elapsed, highscore_new, previous_best_net_wpm=prev_best)
 
 
 def _clear_screen():  # pragma: no cover - simple utility
@@ -143,12 +166,79 @@ def end_screen(res: SessionResult):  # pragma: no cover - I/O convenience
 	print("==============================")
 
 
+_fallback_banner_printed = False
+
+
+def _maybe_print_fallback_banner():  # pragma: no cover - simple UX hint
+	global _fallback_banner_printed
+	if _fallback_banner_printed:
+		return
+	try:
+		import curses  # type: ignore
+	except Exception:
+		print("[Plain Mode] Running without curses (limited live feedback).")
+		print("Install 'windows-curses' on Windows for full UI later.")
+	finally:
+		_fallback_banner_printed = True
+
+
+def _prompt_mode_change(current: ModeConfig) -> ModeConfig:  # pragma: no cover - user interaction
+	print("Change mode:")
+	print(" 1) Timed")
+	print(" 2) Word-count")
+	print(" 3) Toggle punctuation (current %.2f)" % current.punctuation_prob)
+	print(" 4) Toggle numbers (currently %s)" % ("ON" if current.numbers else "OFF"))
+	print(" 5) Change word list")
+	choice = input("Select option (blank to cancel): ").strip()
+	if choice == "1":
+		val = input("Seconds: ").strip()
+		try:
+			secs = int(val)
+			return ModeConfig(timed_seconds=secs, word_count=None, punctuation_prob=current.punctuation_prob, numbers=current.numbers, wordlist_path=current.wordlist_path, top_n_highscores=current.top_n_highscores)
+		except ValueError:
+			print("Invalid seconds")
+	elif choice == "2":
+		val = input("Word count: ").strip()
+		try:
+			wc = int(val)
+			return ModeConfig(timed_seconds=None, word_count=wc, punctuation_prob=current.punctuation_prob, numbers=current.numbers, wordlist_path=current.wordlist_path, top_n_highscores=current.top_n_highscores)
+		except ValueError:
+			print("Invalid number")
+	elif choice == "3":
+		val = input("New punctuation probability 0..1: ").strip()
+		try:
+			p = float(val)
+			if 0 <= p <= 1:
+				current.punctuation_prob = p
+		except ValueError:
+			pass
+	elif choice == "4":
+		current.numbers = not current.numbers
+	elif choice == "5":
+		path = input("Word list path: ").strip()
+		if path:
+			from pathlib import Path
+			p = Path(path)
+			if p.exists():
+				current.wordlist_path = p
+	return current
+
+
 def interactive_loop(initial_cfg: ModeConfig):  # pragma: no cover - user interaction
+	_maybe_print_fallback_banner()
 	cfg = initial_cfg
 	while True:
-		res = run_session(cfg)
+		try:
+			res = run_session(cfg)
+		except KeyboardInterrupt:
+			print("\n[Interrupted] Returning to menu.")
+			break
 		end_screen(res)
-		choice = input("(R)estart same / (Q)uit? ").strip().lower()
+		choice = input("(R)estart / (M)ode change / (Q)uit? ").strip().lower()
 		if choice.startswith("q"):
 			break
+		if choice.startswith("m"):
+			cfg = _prompt_mode_change(cfg)
+			continue
+		# default restart same
 		continue
