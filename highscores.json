@@ -3,12 +3,57 @@
     "timed-15-p0-n0": [
       {
         "mode_key": "timed-15-p0-n0",
+        "wpm": 61.59,
+        "accuracy": 1.0,
+        "raw_wpm": 61.59,
+        "errors": 0,
+        "total_chars": 77,
+        "timestamp": "2025-08-09T03:33:12Z"
+      },
+      {
+        "mode_key": "timed-15-p0-n0",
+        "wpm": 52.78,
+        "accuracy": 0.9714,
+        "raw_wpm": 55.97,
+        "errors": 2,
+        "total_chars": 70,
+        "timestamp": "2025-08-09T03:39:03Z"
+      },
+      {
+        "mode_key": "timed-15-p0-n0",
+        "wpm": 50.37,
+        "accuracy": 0.9091,
+        "raw_wpm": 61.56,
+        "errors": 7,
+        "total_chars": 77,
+        "timestamp": "2025-08-09T03:29:43Z"
+      },
+      {
+        "mode_key": "timed-15-p0-n0",
         "wpm": 43.2,
         "accuracy": 0.9821,
         "raw_wpm": 44.8,
         "errors": 1,
         "total_chars": 56,
         "timestamp": "2025-08-08T18:14:56Z"
+      },
+      {
+        "mode_key": "timed-15-p0-n0",
+        "wpm": 37.58,
+        "accuracy": 0.9273,
+        "raw_wpm": 43.98,
+        "errors": 4,
+        "total_chars": 55,
+        "timestamp": "2025-08-09T03:32:40Z"
+      },
+      {
+        "mode_key": "timed-15-p0-n0",
+        "wpm": 26.38,
+        "accuracy": 0.8113,
+        "raw_wpm": 42.37,
+        "errors": 10,
+        "total_chars": 53,
+        "timestamp": "2025-08-09T03:29:22Z"
       }
     ],
     "timed-20-p0-n0": [
@@ -29,6 +74,86 @@
         "errors": 3,
         "total_chars": 58,
         "timestamp": "2025-08-08T18:21:34Z"
+      }
+    ],
+    "words-3-p0-n0": [
+      {
+        "mode_key": "words-3-p0-n0",
+        "wpm": 0.0,
+        "accuracy": 0.2,
+        "raw_wpm": 0.0,
+        "errors": 12,
+        "total_chars": 15,
+        "timestamp": "2025-08-09T03:28:17Z"
+      }
+    ],
+    "words-5-p0-n0": [
+      {
+        "mode_key": "words-5-p0-n0",
+        "wpm": 0.0,
+        "accuracy": 0.0,
+        "raw_wpm": 0.0,
+        "errors": 0,
+        "total_chars": 0,
+        "timestamp": "2025-08-09T03:28:17Z"
+      }
+    ],
+    "timed-30-p0-n0": [
+      {
+        "mode_key": "timed-30-p0-n0",
+        "wpm": 57.99,
+        "accuracy": 0.9739,
+        "raw_wpm": 61.19,
+        "errors": 4,
+        "total_chars": 153,
+        "timestamp": "2025-08-09T03:31:47Z"
+      }
+    ],
+    "timed-10-p0-n0": [
+      {
+        "mode_key": "timed-10-p0-n0",
+        "wpm": 67.19,
+        "accuracy": 1.0,
+        "raw_wpm": 67.19,
+        "errors": 0,
+        "total_chars": 56,
+        "timestamp": "2025-08-09T03:38:04Z"
+      },
+      {
+        "mode_key": "timed-10-p0-n0",
+        "wpm": 58.75,
+        "accuracy": 1.0,
+        "raw_wpm": 58.75,
+        "errors": 0,
+        "total_chars": 49,
+        "timestamp": "2025-08-09T03:36:54Z"
+      },
+      {
+        "mode_key": "timed-10-p0-n0",
+        "wpm": 57.57,
+        "accuracy": 0.98,
+        "raw_wpm": 59.97,
+        "errors": 1,
+        "total_chars": 50,
+        "timestamp": "2025-08-09T03:37:15Z"
+      },
+      {
+        "mode_key": "timed-10-p0-n0",
+        "wpm": 56.35,
+        "accuracy": 0.9608,
+        "raw_wpm": 61.14,
+        "errors": 2,
+        "total_chars": 51,
+        "timestamp": "2025-08-09T03:37:43Z"
+      },
+      {
+        "mode_key": "timed-10-p0-n0",
+        "wpm": 13.19,
+        "accuracy": 0.6667,
+        "raw_wpm": 39.58,
+        "errors": 11,
+        "total_chars": 33,
+        "timestamp": "2025-08-09T03:38:18Z"
       }
     ]
   }

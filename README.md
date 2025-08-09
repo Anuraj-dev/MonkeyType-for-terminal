@@ -33,6 +33,12 @@ A powerful terminal typing practice tool with intelligent error detection, smart
 - **Word Count Mode**: Type a specific number of words
 - **Mixed Content**: Optional punctuation and numbers
 - **Progressive Difficulty**: Easy menu-driven difficulty selection
+- **Timed Presets + Start**: Quick-select 15s / 30s / 60s / Custom and press "S" to start; remembers your last choice
+
+### 🔊 Live Feedback & Overlay
+
+- **Sound on Commit**: Correct word → plays `correct.wav`, mistake/skip → plays `wrong.wav`
+- **Current-Word Overlay**: Clear, colored overlay with a caret shows exactly where you are in the word (curses UI)
 
 ### 🖥️ **Cross-Platform Support**
 
@@ -77,6 +83,10 @@ pip install -r requirements.txt
 python main.py          # Main game with menu
 python demo.py          # Enhanced demo with difficulty selection
 ```
+
+In the interactive menu:
+- Choose "Timed session" to pick presets (15s / 30s / 60s / Custom)
+- Press "S" to start quickly with the selected timer (default 15s on first run, then your last used)
 
 **Direct Command Line:**
 
@@ -153,11 +163,12 @@ python3 demo.py          # Start typing practice!
 
 ### Game Flow
 
-1. **Choose your mode**: Timed (60s) or Word Count (25 words)
+1. **Choose your mode**: Timed [15s/30s/60s/Custom] or Word Count
 2. **Select difficulty**: From easy words to complex programming terms
-3. **Start typing**: Words appear one by one with real-time feedback
+3. **Start typing**: Words appear with a bold caret and colored overlay in curses mode
 4. **View results**: Get detailed statistics and improvement tracking
-5. **Change settings**: Press 'M' after a session to modify difficulty/mode
+5. **Start quickly**: Press 'S' in the menu to launch with the current timed preset
+6. **Change settings**: Press 'M' after a session to modify difficulty/mode
 
 ### Difficulty Selection Menu
 
@@ -348,12 +359,14 @@ python main.py
 - **Install**: `pip install windows-curses` for full-screen mode
 - **Fallback**: Automatic plain-text mode if curses unavailable
 - **Tested**: Windows 10/11 with PowerShell and Command Prompt
+ - **Sound**: Works out of the box (uses built-in `winsound`)
 
 ### Linux/Mac
 
 - **Built-in**: Native curses support included
 - **Terminal**: Works in any terminal emulator
 - **SSH**: Remote typing practice supported
+ - **Sound**: Optional — install `simpleaudio` for audio cues
 
 #### 🐧 **Linux Installation & Setup**
 
@@ -388,6 +401,9 @@ pip install -e .
 
 # 4. Install development dependencies (optional)
 pip install -r requirements.txt
+
+# Optional: enable audio feedback on Linux/macOS
+pip install simpleaudio
 ```
 
 **Running on Linux:**

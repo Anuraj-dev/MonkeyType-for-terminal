@@ -23,6 +23,7 @@ from typing_game.config import (
 	ModeConfig,
 	load_last_config,
 	merge_cli_args,
+	get_or_create_config_path,
 	save_last_config,
 )
 from typing_game.engine import interactive_loop, _choose_difficulty
@@ -47,24 +48,56 @@ def print_highscores(limit: int = 25):  # pragma: no cover - output helper
 
 
 # ------------------------------- Interactive Menu ----------------------------
-def interactive_menu(base_cfg: ModeConfig) -> ModeConfig:  # pragma: no cover - interactive
+def interactive_menu(base_cfg: ModeConfig, *, config_exists: bool) -> ModeConfig:  # pragma: no cover - interactive
+	# Determine default timed seconds: last used if config exists, else 15s
+	selected_timed = base_cfg.timed_seconds if (config_exists and base_cfg.timed_seconds) else 15
+
+	def timed_submenu() -> ModeConfig | None:
+		nonlocal selected_timed
+		while True:
+			print("\n-- Timed Session --")
+			print(f"Selected: {selected_timed}s")
+			print(" 1) 15s    2) 30s    3) 60s    4) Custom")
+			print(" S) Start   B) Back")
+			sub = input("Choose: ").strip().lower()
+			if sub == "1":
+				selected_timed = 15
+			elif sub == "2":
+				selected_timed = 30
+			elif sub == "3":
+				selected_timed = 60
+			elif sub == "4":
+				val = input("Enter seconds: ").strip()
+				try:
+					secs = int(val)
+					if secs > 0:
+						selected_timed = secs
+					else:
+						print("Must be > 0")
+				except ValueError:
+					print("Invalid integer")
+			elif sub == "s":
+				return ModeConfig(timed_seconds=selected_timed, word_count=None, punctuation_prob=base_cfg.punctuation_prob, numbers=base_cfg.numbers, wordlist_path=base_cfg.wordlist_path, top_n_highscores=base_cfg.top_n_highscores)
+			elif sub in {"b", "back"}:
+				return None
+			else:
+				print("Unknown option")
+
 	while True:
 		print("\n=== Typing Game Menu ===")
-		print("1) Timed session")
+		print(f"1) Timed session [{selected_timed}s]")
 		print("2) Word count session")
 		print("3) Show highscores")
 		print("4) Toggle punctuation (currently: %.2f)" % base_cfg.punctuation_prob)
 		print(f"5) Toggle numbers (currently: {'ON' if base_cfg.numbers else 'OFF'})")
-		print("6) Change difficulty (currently: %s)" % (base_cfg.wordlist_path.name if base_cfg.wordlist_path else "<default>"))
+		print("6) Change difficulty (currently: %s" % (base_cfg.wordlist_path.name if base_cfg.wordlist_path else "<default>") + ")")
+		print(f"S) Start [Timed {selected_timed}s]")
 		print("Q) Quit")
 		choice = input("Select: ").strip().lower()
 		if choice == "1":
-			val = input("Seconds (e.g. 60): ").strip()
-			try:
-				secs = int(val)
-				return ModeConfig(timed_seconds=secs, word_count=None, punctuation_prob=base_cfg.punctuation_prob, numbers=base_cfg.numbers, wordlist_path=base_cfg.wordlist_path, top_n_highscores=base_cfg.top_n_highscores)
-			except ValueError:
-				print("Invalid integer.")
+			res = timed_submenu()
+			if res is not None:
+				return res
 		elif choice == "2":
 			val = input("Word count (e.g. 50): ").strip()
 			try:
@@ -90,6 +123,8 @@ def interactive_menu(base_cfg: ModeConfig) -> ModeConfig:  # pragma: no cover - 
 			new_wordlist = _choose_difficulty()
 			if new_wordlist is not None:
 				base_cfg.wordlist_path = new_wordlist
+		elif choice == "s":
+			return ModeConfig(timed_seconds=selected_timed, word_count=None, punctuation_prob=base_cfg.punctuation_prob, numbers=base_cfg.numbers, wordlist_path=base_cfg.wordlist_path, top_n_highscores=base_cfg.top_n_highscores)
 		elif choice in {"q", "quit", "exit"}:
 			raise SystemExit(0)
 		else:
@@ -122,7 +157,8 @@ def run_from_args(ns: argparse.Namespace, last_cfg: ModeConfig):  # pragma: no c
 		return
 	# If no specific args (like --timed) passed, go interactive menu
 	if not args_provided(ns):
-		cfg = interactive_menu(last_cfg)
+		cfg_path = get_or_create_config_path()
+		cfg = interactive_menu(last_cfg, config_exists=cfg_path.exists())
 	else:
 		cfg = merge_cli_args(last_cfg, ns)
 	interactive_loop(cfg)

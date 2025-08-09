@@ -34,6 +34,7 @@ __all__ = [
 	"wrap_words",
 	"build_progress_bar",
 	"highlight_word",
+	"draw_highlighted_word",
 	"build_header_line",
 	"normalize_key",
 	"is_printable_char",
@@ -191,6 +192,59 @@ def highlight_word(target: str, typed: str, caret: bool = True) -> List[Tuple[st
 			out.append((target[len(typed):], "pending"))
 	
 	return out
+
+
+def draw_highlighted_word(screen, row: int, col: int, target: str, typed: str) -> None:  # pragma: no cover - curses
+	"""Draw the current word with highlight styles at the given position.
+
+	Uses color pairs:
+	  - correct -> COLOR_CORRECT
+	  - wrong   -> COLOR_WRONG
+	  - caret   -> COLOR_CARET
+	  - pending -> COLOR_DIM
+	"""
+	if not curses or screen is None:
+		# Fallback: plain text rendering
+		text = "".join(seg for seg, _ in highlight_word(target, typed))
+		try:
+			screen.addnstr(row, col, text, 10**9)
+		except Exception:
+			pass
+		return
+
+	segments = highlight_word(target, typed)
+	# Draw label and then segments with attributes
+	try:
+		max_cols = curses.COLS - 1
+	except Exception:
+		max_cols = 80
+	x = col
+	for seg, style in segments:
+		if not seg:
+			continue
+		if x >= max_cols:
+			break
+		if style == "correct":
+			attr = curses.color_pair(COLOR_CORRECT)
+		elif style == "wrong":
+			attr = curses.color_pair(COLOR_WRONG)
+		elif style == "caret":
+			attr = curses.color_pair(COLOR_CARET) | getattr(curses, "A_BOLD", 0)
+		else:  # pending
+			attr = curses.color_pair(COLOR_DIM)
+		# Ensure we don't overflow screen width
+		remaining = max_cols - x
+		if remaining <= 0:
+			break
+		try:
+			screen.addnstr(row, x, seg, remaining, attr)
+		except Exception:
+			# Try without attr if terminal rejects attributes
+			try:
+				screen.addnstr(row, x, seg, remaining)
+			except Exception:
+				break
+		x += min(len(seg), remaining)
 
 
 def build_progress_bar(progress: float, width: int, fill_char: str = "#") -> str:

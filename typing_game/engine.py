@@ -39,10 +39,12 @@ from .ui import (
 	build_header_line,
 	build_progress_bar,
 	highlight_word,
+	draw_highlighted_word,
 	normalize_key,
 	wrap_words,
 )
 from .utils import debug_log
+from .sound import play_correct, play_wrong
 
 __all__ = [
 	"run_session",
@@ -68,13 +70,19 @@ def _commit_word(stats: LiveStats, target: str, typed: str):
 	for i, ch in enumerate(typed):
 		correct = i < len(target) and ch == target[i]
 		update_on_char(stats, correct)
-	
+
 	# Count omissions (characters not typed) as errors
 	if len(typed) < len(target):
 		omissions = len(target) - len(typed)
 		for _ in range(omissions):
 			update_on_char(stats, False)  # Each omitted character is an error
-	
+
+	# Play feedback sound based on overall word correctness
+	is_correct = (typed == target)
+	if is_correct:
+		play_correct()
+	else:
+		play_wrong()
 	# Space after word (unless last) counted when user entered space; already handled.
 
 
@@ -237,8 +245,9 @@ def end_screen(res: SessionResult):  # pragma: no cover - I/O convenience
 			print("🎯 Matched your best!")
 	else:
 		print("🆕 First attempt for this mode!")
-	
-	if res.highscore_new:
+
+	# Sanity: only show saved banner if it actually beat the previous
+	if res.highscore_new and (res.previous_best_net_wpm is None or res.net_wpm > res.previous_best_net_wpm):
 		print("*** NEW HIGHSCORE SAVED! ***")
 	elif res.previous_best_net_wpm is not None and res.net_wpm <= res.previous_best_net_wpm:
 		print("💡 No highscore saved (no improvement)")
@@ -482,15 +491,16 @@ def _run_session_curses(cfg: ModeConfig) -> SessionResult:  # pragma: no cover -
 			scr.addnstr(0, 0, header, curses.COLS - 1)
 			scr.addnstr(1, 0, bar, curses.COLS - 1)
 
-			# Word area
+			# Word area: render upcoming words list
 			display_words = [target] + targets[current_index + 1: current_index + 15]
-			# Highlight current word
-			segments = highlight_word(target, typed_current)
-			rendered_current = "".join(seg for seg, _ in segments)
-			display_words[0] = rendered_current
+			# For compact list view, render current word unstyled, we'll draw styled overlay below
 			wrapped = wrap_words(display_words, max(20, curses.COLS - 2))
-			for i, line in enumerate(wrapped[: curses.LINES - 3]):
+			for i, line in enumerate(wrapped[: curses.LINES - 4]):
 				scr.addnstr(3 + i, 0, line, curses.COLS - 1)
+
+			# Overlay: prominently show the current word with live caret and colors
+			# Place it just above the word list area
+			draw_highlighted_word(scr, 2, 0, target, typed_current)
 			scr.refresh()
 			# Sleep a tiny bit to reduce CPU spin
 			time.sleep(0.01)
@@ -511,7 +521,10 @@ def _run_session_curses(cfg: ModeConfig) -> SessionResult:  # pragma: no cover -
 			prev_best = max((e.wpm for e in store[key]), default=None)
 	except Exception:
 		pass
-	entry = HighScoreEntry.create(key, net_wpm, acc, raw_wpm, stats.errors, stats.chars_typed)
-	highscore_new = record_highscore(key, entry, top_n=cfg.top_n_highscores)
+	# Only record highscore if it's an improvement or first attempt
+	highscore_new = False
+	if prev_best is None or net_wpm > prev_best:
+		entry = HighScoreEntry.create(key, net_wpm, acc, raw_wpm, stats.errors, stats.chars_typed)
+		highscore_new = record_highscore(key, entry, top_n=cfg.top_n_highscores)
 	consistency = compute_consistency(stats)
 	return SessionResult(cfg, raw_wpm, net_wpm, acc, stats.errors, stats.chars_typed, elapsed, highscore_new, previous_best_net_wpm=prev_best, consistency=consistency)
