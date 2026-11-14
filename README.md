@@ -1,605 +1,170 @@
-# Typing Game (Enhanced with Smart Features)
+<h1 align="center">MonkeyType for terminal</h1>
 
-A powerful terminal typing practice tool with intelligent error detection, smart highscore management, and multiple difficulty levels. Supports both timed and word-count modes with real-time feedback and comprehensive statistics.
+<p align="center">
+  A Monkeytype-style typing practice game for the terminal, written in Python.<br />
+  Type against the clock or a word count, then see your net WPM and accuracy.
+</p>
 
-**🔗 Repository:** https://github.com/Anuraj-dev/MonkeyType-for-terminal
+<p align="center">
+  <a href="#installation">Install</a>
+  ·
+  <a href="#running-it">Run it</a>
+  ·
+  <a href="#controls">Controls</a>
+</p>
 
-## ✨ Key Features
+The game shows a stream of words. You type each word and submit it. Mismatched letters, missing letters and extra letters all count as errors. When a run ends, you see raw WPM, net WPM, accuracy and consistency, and the run is saved as a highscore if it beats your best for that mode.
 
-### 🎯 **Smart Typing Analysis**
+It runs as `main.py` from the repository folder. Where curses is available, you get a full-screen view with a live header. Everywhere else, it falls back to plain line prompts. Linux and macOS need only Python 3.11 or newer. Windows also needs `windows-curses`. There is no account, and the code makes no network calls.
 
-- **Accurate Error Detection**: Counts omissions, mismatches, and extra characters
-- **Real-time Feedback**: Live WPM, accuracy, and error tracking
-- **Word-by-word Analysis**: Detailed breakdown of typing mistakes
+## What you get
 
-### 🏆 **Intelligent Highscore System**
+- **Live full-screen typing view.** The header shows elapsed time, net WPM, accuracy and errors. The current word gets a caret, correct letters turn green, and wrong letters turn red.
+- **Errors counted per character.** A mismatch, a missing letter and an extra letter each count as one error. Net WPM subtracts errors from correct characters, so a fast run with typos scores lower than a clean run at the same speed.
+- **Highscores only on improvement.** Each mode, such as `timed-60-p0-n0`, keeps its own top 25 runs. A run is saved when it beats your best net WPM, or when it is the first run in that mode.
+- **Punctuation and numbers.** `--punct 0.1` adds one of `, . ? ! ;` to about 10 percent of words. `--numbers` replaces about 15 percent of words with a single digit.
+- **Sound on each submitted word.** A correct word plays `sounds/correct.wav`. Any other word plays `sounds/wrong.wav`. Windows uses the built-in `winsound` module. On Linux and macOS, install `simpleaudio` to hear the sounds. Without it, the game stays silent.
+- **Remembers your last settings.** Mode, punctuation, numbers and word list are saved when you quit. The menu starts from them next time.
+- **Word lists for each level.** Easy, medium, hard, programming and Alice in Wonderland are in the difficulty menu. Any text file works as your own list with `--list`.
 
-- **Smart Storage**: Only saves highscores when you actually improve
-- **Performance Tracking**: Shows improvement deltas (+X.XX WPM or -X.XX WPM)
-- **First-time Friendly**: Always saves your first attempt for comparison
+## Installation
 
-### 📚 **Multiple Difficulty Levels**
+Clone the repository and run everything from inside it. The difficulty menu finds its word lists relative to the current folder.
 
-- **Easy**: Short common words (the, and, for...)
-- **Medium**: Moderate length words (about, before, which...)
-- **Hard**: Complex words (sophisticated, implementation...)
-- **Programming**: Technical terms (polymorphism, encapsulation...)
-- **Book Content**: Practice with real literature (Alice in Wonderland included)
-- **Custom Books**: Add your own 10-page books for practice
-
-### ⚙️ **Flexible Game Modes**
-
-- **Timed Mode**: Practice for a set duration (e.g., 60 seconds)
-- **Word Count Mode**: Type a specific number of words
-- **Mixed Content**: Optional punctuation and numbers
-- **Progressive Difficulty**: Easy menu-driven difficulty selection
-- **Timed Presets + Start**: Quick-select 15s / 30s / 60s / Custom and press "S" to start; remembers your last choice
-
-### 🔊 Live Feedback & Overlay
-
-- **Sound on Commit**: Correct word → plays `correct.wav`, mistake/skip → plays `wrong.wav`
-- **Current-Word Overlay**: Clear, colored overlay with a caret shows exactly where you are in the word (curses UI)
-
-### 🖥️ **Cross-Platform Support**
-
-- **Real-time Mode**: Full-screen curses interface with live updates
-- **Fallback Mode**: Plain text interface when curses unavailable
-- **Windows Support**: Automatic `windows-curses` integration
-
-## 🚀 Quick Start
-
-### Installation
-
-1. **Clone the repository:**
-
-```bash
+```sh
 git clone https://github.com/Anuraj-dev/MonkeyType-for-terminal.git
 cd MonkeyType-for-terminal
 ```
 
-2. **Install the package in editable mode:**
-
-```bash
-pip install -e .
-```
-
-3. **For Windows users (full-screen mode):**
-
-```bash
-pip install windows-curses
-```
-
-4. **For development:**
-
-```bash
-pip install -r requirements.txt
-```
-
-### Running the Game
-
-**Interactive Mode (Recommended):**
-
-```bash
-python main.py          # Main game with menu
-python demo.py          # Enhanced demo with difficulty selection
-```
-
-In the interactive menu:
-- Choose "Timed session" to pick presets (15s / 30s / 60s / Custom)
-- Press "S" to start quickly with the selected timer (default 15s on first run, then your last used)
-
-**Direct Command Line:**
-
-```bash
-python main.py --timed 60 --punct 0.1    # 60-second timed mode with punctuation
-python main.py --words 50 --numbers      # 50-word mode with numbers
-python main.py --show-highscores         # View your progress
-```
-
-### Adding Your Own Books
-
-1. **Create a text file** with your book content:
-
-```bash
-# Paste your 10-page book into:
-data/wordlists/my_book.txt
-```
-
-2. **Convert to typing format:**
-
-```bash
-python convert_book.py
-```
-
-3. **Play with your book** using the difficulty menu option!
-
-## 🐧 **Linux Quick Start**
-
-**One-command setup for Linux users:**
-
-```bash
-# Ubuntu/Debian - Complete setup
-sudo apt update && sudo apt install python3 python3-pip python3-venv git -y
-git clone https://github.com/Anuraj-dev/MonkeyType-for-terminal.git && cd MonkeyType-for-terminal
-python3 -m venv venv && source venv/bin/activate
-pip install -e . && python3 demo.py
-```
-
-**Fedora/CentOS:**
-
-```bash
-sudo dnf install python3 python3-pip git -y
-git clone https://github.com/Anuraj-dev/MonkeyType-for-terminal.git && cd MonkeyType-for-terminal
-python3 -m venv venv && source venv/bin/activate
-pip install -e . && python3 demo.py
-```
-
-**Arch Linux:**
-
-```bash
-sudo pacman -S python python-pip git
-git clone https://github.com/Anuraj-dev/MonkeyType-for-terminal.git && cd MonkeyType-for-terminal
-python3 -m venv venv && source venv/bin/activate
-pip install -e . && python3 demo.py
-```
-
-**Daily Usage (after setup):**
-
-```bash
-cd MonkeyType-for-terminal
-source venv/bin/activate  # Activate environment
-python3 demo.py          # Start typing practice!
-```
-
-## 🎮 How to Play
-
-### Basic Controls
-
-- **Type each word** exactly as shown
-- **Press SPACE or ENTER** to submit each word
-- **Use BACKSPACE** to correct mistakes
-- **Type '/quit'** to exit early (plain mode)
-- **Press 'q'** to quit (curses mode)
-
-### Game Flow
-
-1. **Choose your mode**: Timed [15s/30s/60s/Custom] or Word Count
-2. **Select difficulty**: From easy words to complex programming terms
-3. **Start typing**: Words appear with a bold caret and colored overlay in curses mode
-4. **View results**: Get detailed statistics and improvement tracking
-5. **Start quickly**: Press 'S' in the menu to launch with the current timed preset
-6. **Change settings**: Press 'M' after a session to modify difficulty/mode
-
-### Difficulty Selection Menu
-
-When you choose "Change difficulty" you'll see:
-
-```
-🎯 Choose Difficulty Level:
-1. Easy (short common words)
-2. Medium (moderate length words)
-3. Hard (complex words)
-4. Programming (technical terms)
-5. Alice in Wonderland (book content)
-6. Default (mixed)
-```
-
-## 📊 Enhanced Statistics
-
-### Intelligent Error Detection
-
-- **Character Mismatches**: Wrong letters typed
-- **Omissions**: Characters you forgot to type
-- **Extra Characters**: Typing beyond the word length
-- **Real Accuracy**: Includes all types of errors for honest metrics
-
-### Smart Highscore Management
-
-- **Improvement Only**: Highscores saved only when you beat your previous best
-- **Progress Tracking**: Clear indicators showing improvement or decline
-- **Performance Delta**: See exactly how much you improved (+2.5 WPM!)
-- **First Attempt**: Always saves your initial score for future comparison
-
-### Comprehensive Metrics
-
-- **Raw WPM**: Total typing speed including errors
-- **Net WPM**: Speed adjusted for accuracy (penalizes mistakes)
-- **Accuracy**: Percentage of correctly typed characters
-- **Consistency**: Variation in your typing rhythm
-- **Error Count**: Total mistakes made during session
-
-## ⚙️ Advanced Configuration
-
-### CLI Flags
-
-| Flag                | Description                                       |
-| ------------------- | ------------------------------------------------- |
-| `--timed SECONDS`   | Timed session (mutually exclusive with `--words`) |
-| `--words COUNT`     | Fixed number of words                             |
-| `--punct FLOAT`     | Punctuation probability 0..1 (e.g. 0.1)           |
-| `--numbers`         | Enable occasional number replacement              |
-| `--list PATH`       | Custom word list file path                        |
-| `--show-highscores` | Display highscores and exit                       |
-
-### Available Word Lists
-
-The game includes several pre-made difficulty levels:
-
-- **`easy.txt`**: 36 short common words
-- **`medium.txt`**: 36 moderate length words
-- **`hard_words.txt`**: 54 complex vocabulary words
-- **`programming.txt`**: 53 technical programming terms
-- **`alice_words.txt`**: 283 words from Alice in Wonderland
-- **`english_1k.txt`**: Original mixed word list
-
-### Creating Custom Difficulty Levels
-
-1. **Add words to a file** (one per line):
-
-```
-sophisticated
-implementation
-extraordinary
-# ... more words
-```
-
-2. **Save in** `data/wordlists/my_difficulty.txt`
-
-3. **Update the difficulty chooser** in `engine.py` to include your new list
-
-### Book Content Support
-
-The game can convert any book or text into typing practice:
-
-1. **Paste book content** into `data/wordlists/book_name.txt`
-2. **Run converter**: `python convert_book.py`
-3. **Generated file**: `book_name_words.txt` (one word per line)
-4. **Add to difficulty menu** for easy access
-
-## 📈 Highscore System
-
-### Smart Storage Logic
-
-- **Improvement-Based**: Highscores only saved when you beat your previous best
-- **No File Spam**: Prevents cluttering with poor performances
-- **First-Time Saves**: Always records your initial attempt for comparison
-- **Local Storage**: `highscores.json` in project directory (or home fallback)
-
-### Highscore Ranking
-
-Each mode creates a separate leaderboard (e.g., `timed-60-p0-n1`):
-
-1. **Net WPM** (descending - primary ranking)
-2. **Accuracy** (descending - tiebreaker)
-3. **Timestamp** (ascending - older first for final ties)
-
-### Progress Tracking
-
-The enhanced end screen shows:
-
-```
-Previous Best Net WPM: 45.20
-🎉 IMPROVEMENT: +3.15 WPM!
-*** NEW HIGHSCORE SAVED! ***
-```
-
-Or for non-improvements:
-
-```
-📉 Below best by 2.10 WPM
-💡 No highscore saved (no improvement)
-```
-
-## 🧮 Metrics Formulas
-
-### Standard WPM Calculations
-
-- **Raw (Gross) WPM** = `(total_chars_typed / 5) / minutes_elapsed`
-- **Net WPM** = `((correct_chars - errors) / 5) / minutes_elapsed` (≥ 0)
-- **Accuracy** = `correct_chars / total_chars_typed` (0 if no chars typed)
-
-### Enhanced Error Detection
-
-- **Character Errors**: Each wrong character counts as 1 error
-- **Omission Errors**: Each missing character counts as 1 error
-- **Total Characters**: Includes typed chars + omitted chars for accurate metrics
-- **Consistency**: Standard deviation of per-word typing times
-
-## 🔧 Development
-
-### Running Tests
-
-```bash
-pytest tests/ -v     # Verbose test output
-pytest tests/ -q     # Quick test run
-```
-
-### Project Structure
-
-```
-MonkeyType-for-terminal/
-├── typing_game/           # Main package
-│   ├── engine.py         # Game logic & sessions
-│   ├── ui.py            # Terminal interface
-│   ├── metrics.py       # WPM & accuracy calculations
-│   ├── storage.py       # Highscore persistence
-│   ├── config.py        # Configuration management
-│   ├── modes.py         # Game mode factories
-│   └── words.py         # Word loading & generation
-├── data/wordlists/       # Difficulty levels & books
-├── tests/               # Comprehensive test suite
-├── main.py             # CLI entry point
-├── demo.py             # Enhanced interactive demo
-└── convert_book.py     # Book-to-wordlist converter
-```
-
-### Key Improvements Made
-
-1. **Enhanced Error Detection**: Omissions now counted as errors
-2. **Smart Highscore Logic**: Only saves actual improvements
-3. **Difficulty Selection**: User-friendly menu replaces file paths
-4. **Better End Screen**: Shows improvement deltas and feedback
-5. **Enter Key Support**: Both Space and Enter work for word submission
-6. **Book Content Support**: Easy conversion of any text to typing practice
-
-### Debug Mode
-
-Set environment variable for detailed logging:
-
-```bash
-set TYPING_GAME_DEBUG=1    # Windows
-export TYPING_GAME_DEBUG=1 # Linux/Mac
-python main.py
-```
-
-## 🖥️ Platform Support
+| Platform | You need |
+| --- | --- |
+| **Windows** | Python 3.11 or newer, plus `windows-curses` |
+| **Linux** | Python 3.11 or newer. The curses module comes with Python. |
+| **macOS** | Python 3.11 or newer. The curses module comes with Python. |
+
+The code uses `datetime.UTC`, which needs Python 3.11 or newer. Check your version with `python3 --version`.
 
 ### Windows
 
-- **Install**: `pip install windows-curses` for full-screen mode
-- **Fallback**: Automatic plain-text mode if curses unavailable
-- **Tested**: Windows 10/11 with PowerShell and Command Prompt
- - **Sound**: Works out of the box (uses built-in `winsound`)
+Install the curses backend. Without it, the game runs in plain line mode.
 
-### Linux/Mac
-
-- **Built-in**: Native curses support included
-- **Terminal**: Works in any terminal emulator
-- **SSH**: Remote typing practice supported
- - **Sound**: Optional — install `simpleaudio` for audio cues
-
-#### 🐧 **Linux Installation & Setup**
-
-**Prerequisites:**
-
-```bash
-# Ubuntu/Debian
-sudo apt update
-sudo apt install python3 python3-pip python3-venv git
-
-# CentOS/RHEL/Fedora
-sudo dnf install python3 python3-pip git
-# or for older versions: sudo yum install python3 python3-pip git
-
-# Arch Linux
-sudo pacman -S python python-pip git
+```sh
+pip install windows-curses
 ```
 
-**Step-by-Step Installation:**
+### Linux and macOS
 
-```bash
-# 1. Clone the repository
-git clone https://github.com/Anuraj-dev/MonkeyType-for-terminal.git
-cd MonkeyType-for-terminal
+The core game has no packages to install. For sound, install `simpleaudio`.
 
-# 2. Create virtual environment (recommended)
-python3 -m venv venv
-source venv/bin/activate  # Activate virtual environment
-
-# 3. Install the typing game
-pip install -e .
-
-# 4. Install development dependencies (optional)
-pip install -r requirements.txt
-
-# Optional: enable audio feedback on Linux/macOS
+```sh
 pip install simpleaudio
 ```
 
-**Running on Linux:**
+If pip refuses with an externally-managed-environment error, create a virtual environment first with `python3 -m venv venv` and `source venv/bin/activate`.
 
-```bash
-# Activate virtual environment (if using)
-source venv/bin/activate
+## Running it
 
-# Run the game - these all work on Linux
-python3 main.py                    # Interactive menu
-python3 demo.py                    # Enhanced demo
-python3 main.py --timed 60         # Direct timed mode
-python3 main.py --show-highscores  # View progress
+Run these from the repository root.
 
-# Make executable (optional)
-chmod +x main.py
-./main.py                         # Direct execution
+```sh
+python3 main.py                                   # opens the menu
+python3 main.py --timed 60                        # 60 seconds, straight into a session
+python3 main.py --words 50 --punct 0.1 --numbers  # 50 words with punctuation and numbers
+python3 main.py --list data/wordlists/alice_words.txt --timed 60
+python3 main.py --show-highscores                 # print stored highscores and exit
+python3 demo.py                                   # 25 words, difficulty menu first
 ```
 
-**Terminal Compatibility:**
+On Windows, use `python` in place of `python3`.
 
-- ✅ **GNOME Terminal** - Full curses support
-- ✅ **Konsole** (KDE) - Full curses support
-- ✅ **xterm** - Full curses support
-- ✅ **Alacritty** - Full curses support
-- ✅ **Terminator** - Full curses support
-- ✅ **tmux/screen** - Full curses support
-- ✅ **SSH sessions** - Works over SSH connections
-- ⚠️ **Basic terminals** - Falls back to plain mode
+Flags:
 
-**Linux-Specific Features:**
+| Flag | Meaning |
+| --- | --- |
+| `--timed SECONDS` | Timed session. Cannot be combined with `--words`. |
+| `--words COUNT` | Word-count session. |
+| `--punct FLOAT` | Chance from 0 to 1 that a word gets punctuation. |
+| `--numbers` | Replace some words with a digit. |
+| `--list PATH` | Use this text file as the word list. |
+| `--show-highscores` | Print the top 25 runs for each mode and exit. |
 
-- **No additional packages needed** - curses built into Python
-- **Better performance** - Native terminal integration
-- **SSH support** - Practice typing over remote connections
-- **Multiple displays** - Works with any X11/Wayland setup
-- **Package managers** - Can be packaged for distributions
+## Controls
 
-**Troubleshooting Linux Issues:**
+### Menu
 
-```bash
-# If you get "command not found: python"
-python3 main.py  # Use python3 instead
+- `1` opens the timed options. `1`, `2` and `3` pick 15, 30 or 60 seconds. `4` asks for a custom length. `S` starts and `B` goes back.
+- `2` starts a word-count session. `3` shows highscores. `4` sets punctuation. `5` toggles numbers. `6` opens the difficulty menu.
+- `S` starts a timed session with the length you picked. On the first run, the length is 15 seconds.
+- `Q` quits.
 
-# If curses doesn't work in your terminal
-export TERM=xterm-256color  # Set proper terminal type
-python3 main.py             # Try again
+### Typing view
 
-# If you get permission errors
-chmod +x main.py demo.py convert_book.py  # Make scripts executable
+- Type the word, then press Space to submit it. Enter does nothing in this view.
+- Submitting before you finish the word counts the missing letters as errors. Pressing Space with nothing typed counts the whole word as errors.
+- Backspace removes a letter from the screen, but the error it was fixing still counts.
+- `q` quits when the current word is empty.
+- A timed session ends when the clock runs out. A word-count session ends after the last word.
 
-# If virtual environment activation fails
-python3 -m venv --clear venv  # Recreate virtual environment
-source venv/bin/activate
-```
+### Plain mode
 
-**Advanced Linux Usage:**
+Plain mode runs when curses is missing or the curses view fails. Type the word and press Enter. `/quit` ends the run early, and the stats print at the end.
 
-```bash
-# Run in background and resume later
-python3 main.py &           # Background process
-fg                          # Bring back to foreground
+### End screen
 
-# Use with different Python versions
-python3.9 main.py          # Specific Python version
-python3.11 main.py         # Another version
+`R` or Enter restarts with the same settings. `M` opens the mode menu, where you can change the length, punctuation, numbers or difficulty. `Q` quits.
 
-# Create desktop shortcut (Ubuntu/GNOME)
-cat > ~/Desktop/typing-game.desktop << EOF
-[Desktop Entry]
-Name=Typing Game
-Exec=/path/to/MonkeyType-for-terminal/venv/bin/python /path/to/MonkeyType-for-terminal/main.py
-Icon=utilities-terminal
-Type=Application
-Terminal=true
-EOF
-chmod +x ~/Desktop/typing-game.desktop
-
-# Add to PATH for system-wide access
-echo 'export PATH="$PATH:/path/to/MonkeyType-for-terminal"' >> ~/.bashrc
-source ~/.bashrc
-typing-game  # Now accessible from anywhere
-```
-
-**🚀 Why Linux is Perfect for This Typing Game:**
-
-- ✅ **Native Performance**: No extra dependencies needed
-- ✅ **Terminal Excellence**: Superior terminal capabilities
-- ✅ **SSH Practice**: Practice typing over remote connections
-- ✅ **Lightweight**: Minimal resource usage
-- ✅ **Customizable**: Easy to modify and extend
-- ✅ **Server Usage**: Run on headless servers for remote practice
-- ✅ **Package Friendly**: Can be packaged for distribution repos
-
-**Distribution Packaging (For Maintainers):**
-
-```bash
-# Debian/Ubuntu package structure
-typing-game/
-├── debian/
-│   ├── control          # Package dependencies
-│   ├── rules           # Build rules
-│   └── typing-game.install
-├── DEBIAN/
-│   └── control         # Package metadata
-└── usr/
-    ├── bin/
-    │   └── typing-game  # Main executable
-    └── share/
-        └── typing-game/ # Game data files
-```
-
-### Features by Mode
-
-| Feature                | Curses Mode | Plain Mode |
-| ---------------------- | ----------- | ---------- |
-| Real-time WPM          | ✅          | ❌         |
-| Live word highlighting | ✅          | ❌         |
-| Progress bar           | ✅          | ❌         |
-| Backspace editing      | ✅          | ✅         |
-| All statistics         | ✅          | ✅         |
-| Difficulty selection   | ✅          | ✅         |
-| Highscore tracking     | ✅          | ✅         |
-
-## 🎯 Example Sessions
-
-### Easy Difficulty (Beginner)
+## Scores and metrics
 
 ```
-[1] the: the
-[2] and: and
-[3] for: for
-...
-Net WPM: 25.4  Accuracy: 98.5%  🆕 First attempt!
+raw WPM  = (characters typed / 5) / minutes
+net WPM  = max(0, correct characters - errors) / 5 / minutes
+accuracy = correct characters / characters typed
 ```
 
-### Programming Difficulty (Advanced)
+Each submitted word counts its trailing space as a correct character. Consistency is 1 minus the coefficient of variation of your per-word times, clamped from 0 to 1. It needs at least two timed words, and it stays hidden until then.
 
-```
-[1] polymorphism: polymorphism
-[2] encapsulation: encapulation  ← omission error
-[3] inheritance: inheritance
-...
-Net WPM: 42.1  Accuracy: 91.2%  🎉 IMPROVEMENT: +3.8 WPM!
-```
+### Highscores
 
-### Book Content (Alice in Wonderland)
+Highscores are grouped by mode key. The key encodes the length, punctuation and numbers, so `timed-60-p0-n0` and `timed-60-p0-n1` are separate leaderboards. Runs rank by net WPM, then accuracy, then older first. Each mode keeps its top 25.
 
-```
-[1] Alice: Alice
-[2] was: was
-[3] beginning: begining  ← spelling error
-...
-Net WPM: 38.7  Accuracy: 94.1%  📉 Below best by 1.2 WPM
-```
+## Files the game writes
 
-## 🚀 Future Enhancements
+- `highscores.json` in the folder you run from. If that folder is not writable, the game uses `~/.typing_game_highscores.json`.
+- `~/.typing_game/config.json` with your last-used settings, written when you quit.
 
-### Planned Features
+## Custom word lists
 
-- **Adaptive Difficulty**: Automatic adjustment based on performance
-- **Historical Charts**: Visual progress tracking over time
-- **Custom Themes**: Color schemes and visual customization
-- **Multiplayer Mode**: Race against friends online
-- **Advanced Metrics**: Keystroke dynamics and rhythm analysis
-- **Language Support**: Multiple language word lists
-- **Quote Mode**: Practice with famous quotes and literature
+- Pass any text file with `--list path/to/file.txt`. Words split on whitespace, so punctuation stays attached to each word.
+- To add a list to the difficulty menu, add an entry to `wordlist_map` in `_choose_difficulty` in `typing_game/engine.py`. `demo.py` keeps its own copy of that menu.
+- The game loads a word list once per run. Changing difficulty later in the same run keeps the first list, so restart the program to switch.
+- Choosing `6` in the difficulty menu keeps the current list.
+- `convert_book.py` converts only `data/wordlists/alice_sample.txt` into `alice_words.txt`. It also rewrites `easy.txt` and `medium.txt` from lists in the script, so run it only if you want that.
 
-### Contribution Ideas
+The Alice word lists come from Project Gutenberg's *Alice's Adventures in Wonderland*.
 
-- Add more programming language vocabularies
-- Create themed word lists (medical, legal, academic)
-- Implement word frequency analysis
-- Add typing sound effects
-- Create mobile-friendly web version
+## Troubleshooting
 
-## 📄 License
+- **Plain line mode on Windows.** Install `windows-curses` with `pip install windows-curses`.
+- **Curses view drops to plain mode.** Set `TYPING_GAME_DEBUG=1` to print the error to stderr. On Windows, use `set TYPING_GAME_DEBUG=1`.
+- **"Word list not found" in the difficulty menu.** Run the game from the repository root. The menu resolves `data/wordlists/` from the current folder.
 
-MIT License - feel free to use, modify, and distribute!
+## Code map
 
-## 🙏 Acknowledgments
+| File | What it does |
+| --- | --- |
+| `main.py` | Entry point. Parses flags and runs the menu. |
+| `demo.py` | 25-word practice with its own difficulty menu. |
+| `typing_game/engine.py` | Curses and plain typing loops, the end screen and the difficulty menu. |
+| `typing_game/metrics.py` | WPM, accuracy and consistency. |
+| `typing_game/storage.py` | Reads and writes `highscores.json`. |
+| `typing_game/config.py` | Settings, validation and the saved config file. |
+| `typing_game/words.py` | Loads word lists and adds punctuation and numbers. |
+| `typing_game/ui.py` | Curses setup, the highlighted word and the progress bar. |
+| `typing_game/sound.py` | Plays the correct and wrong sounds. |
+| `convert_book.py` | Alice converter. See Custom word lists. |
 
-- Inspired by Monkeytype and other typing practice tools
-- Built with Python's `curses` library for terminal interfaces
-- Alice in Wonderland text from Project Gutenberg
-- Enhanced with intelligent error detection and progress tracking
+`plan.txt` is the original build plan. Code comments refer to its section numbers.
 
----
+## License
 
-**Ready to improve your typing?**
-
-```bash
-git clone https://github.com/Anuraj-dev/MonkeyType-for-terminal.git
-cd MonkeyType-for-terminal
-pip install -e .
-python demo.py
-```
-
-Happy typing! ⌨️✨
+MIT. See [LICENSE](LICENSE).
